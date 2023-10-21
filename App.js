@@ -175,7 +175,7 @@ function App() {
         </Stack.Navigator>
       </NavigationContainer>
       <Button
-      title="Invoke Native Module"
+      title="Test PX400 Printer"
       onPress={onPress}
     />
     </PaperProvider>

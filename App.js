@@ -12,10 +12,11 @@ import Loading from "./screens/Loading";
 import Retailer from "./screens/Retailer";
 import LanguageSelectionScreen from "./screens/Lang";
 import { StatusBar } from 'react-native';
-
+import {NativeModules, Button} from 'react-native';
 
 
 const Stack = createStackNavigator();
+
 
 function App() {
   const [cartItems, setCartItems] = useState([]);
@@ -26,6 +27,25 @@ function App() {
   StatusBar.setTranslucent(true);
   StatusBar.setBackgroundColor('rgba(0, 0, 0, 0.2)');
 
+  // const openPrinter = () => {
+  //   const PX400PrinterModule = NativeModules.PX400PrinterModule;
+  //   PX400PrinterModule.openPrinter((error, message) => {
+  //     if (error) {
+  //       console.error(error);
+  //     } else {
+  //       console.log(message);
+  //     }
+  //   });
+  // };
+
+  // useEffect(() => {
+  //   console.log("Attempting to open printer")
+  //   openPrinter(); // Call openPrinter when the component mounts
+  // }, []); 
+
+  const { PX400PrinterModule } = NativeModules;
+
+
   const handleAddToCart = (name, quantity, price) => {
     const newItem = { name, quantity, price };
     setCartItems([...cartItems, newItem]);
@@ -34,6 +54,32 @@ function App() {
   const handleRemoveFromCart = (item) => {
     const newCartItems = cartItems.filter((cartItem) => cartItem !== item);
     setCartItems(newCartItems);
+  };
+
+  const onPress = () => {
+    console.log('Invoking native android module');
+          // Call the open method
+      PX400PrinterModule.open();
+
+      // Call the printText method
+      PX400PrinterModule.printText('Hello, this is a test text!');
+
+      // Call the printHtml method
+      PX400PrinterModule.printHtml('sample.html', () => {
+        console.log('Printing HTML finished.');
+      });
+
+      // Call the printQrCode method
+      PX400PrinterModule.printQrCode('Your QR Code Data', (error) => {
+        if (error) {
+          console.error('Error printing QR Code:', error);
+        } else {
+          console.log('Printing QR Code succeeded.');
+        }
+      });
+
+      // Call the close method
+      PX400PrinterModule.close();
   };
 
   useEffect(() => {
@@ -128,6 +174,10 @@ function App() {
           />
         </Stack.Navigator>
       </NavigationContainer>
+      <Button
+      title="Invoke Native Module"
+      onPress={onPress}
+    />
     </PaperProvider>
   );
 }

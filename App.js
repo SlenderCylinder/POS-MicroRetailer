@@ -12,7 +12,7 @@ import Loading from "./screens/Loading";
 import Retailer from "./screens/Retailer";
 import LanguageSelectionScreen from "./screens/Lang";
 import { Alert, ActivityIndicator, PermissionsAndroid, StatusBar } from 'react-native';
-import { NativeModules, Button, Modal, View, Text, FlatList, TouchableOpacity, DeviceEventEmitter } from 'react-native';
+import { NativeModules, Button, Modal, View, Text, FlatList, TouchableOpacity, DeviceEventEmitter, Platform } from 'react-native';
 const Stack = createStackNavigator();
 import {BluetoothManager,BluetoothEscposPrinter,BluetoothTscPrinter} from 'react-native-bluetooth-escpos-printer';
 
@@ -42,10 +42,16 @@ function App() {
         console.log('Bluetooth Connect Permission Denied:', error);
       });
   };
+
+    // Event listener for device discovery
+   // Event listener for device discovery
 useEffect(() => {
   const deviceFoundListener = DeviceEventEmitter.addListener(
     BluetoothManager.EVENT_DEVICE_FOUND,
     (devices) => {
+      // Handle found devices here
+      // You can emit custom events or update state based on found devices
+      // For example, update the state with the found devices
       console.log("Found devices:", devices);
 
     }
@@ -54,6 +60,9 @@ useEffect(() => {
   const deviceAlreadyPairedListener = DeviceEventEmitter.addListener(
     BluetoothManager.EVENT_DEVICE_ALREADY_PAIRED,
     (devices) => {
+      // Handle devices that are already paired
+      // You can emit custom events or update state based on already paired devices
+      // For example, update the state with the already paired devices
       console.log("Already paired devices:", devices);
     }
   );
@@ -61,12 +70,14 @@ useEffect(() => {
   const deviceDiscoverDoneListener = DeviceEventEmitter.addListener(
     BluetoothManager.EVENT_DEVICE_DISCOVER_DONE,
     () => {
-
+      // Handle device discovery done
       console.log("Device discovery done");
+      // You can emit a custom event or perform any necessary actions here
       setIsScanning(false);
     }
   );
 
+  // Clean up the event listeners when the component unmounts
   return () => {
     deviceFoundListener.remove();
     deviceDiscoverDoneListener.remove();
@@ -74,6 +85,23 @@ useEffect(() => {
   };
 }, []);
 
+  // const openPrinter = () => {
+  //   const PX400PrinterModule = NativeModules.PX400PrinterModule;
+  //   PX400PrinterModule.openPrinter((error, message) => {
+  //     if (error) {
+  //       console.error(error);
+  //     } else {
+  //       console.log(message);
+  //     }
+  //   });
+  // };
+
+  // useEffect(() => {
+  //   console.log("Attempting to open printer")
+  //   openPrinter(); // Call openPrinter when the component mounts
+  // }, []); 
+
+  //const { PX400PrinterModule } = NativeModules;
 
 
   const handleAddToCart = (name, quantity, price) => {
@@ -86,6 +114,31 @@ useEffect(() => {
     setCartItems(newCartItems);
   };
 
+  // const onPress = () => {
+  //   console.log('Invoking native android module');
+  //         // Call the open method
+  //     PX400PrinterModule.open();
+
+  //     // Call the printText method
+  //     PX400PrinterModule.printText('Hello, this is a test text!');
+
+  //     // Call the printHtml method
+  //     PX400PrinterModule.printHtml('sample.html', () => {
+  //       console.log('Printing HTML finished.');
+  //     });
+
+  //     // Call the printQrCode method
+  //     PX400PrinterModule.printQrCode('Your QR Code Data', (error) => {
+  //       if (error) {
+  //         console.error('Error printing QR Code:', error);
+  //       } else {
+  //         console.log('Printing QR Code succeeded.');
+  //       }
+  //     });
+
+  //     // Call the close method
+  //     PX400PrinterModule.close();
+  // };
 
   
   const onPress = async () => {
@@ -202,101 +255,36 @@ useEffect(() => {
         Alert.alert(s);
         setBoundAddress(rowData.address);
         // print();
-        // const textToPrint = "Hello from WFP!";
-        // BluetoothTscPrinter.printLabel({
-        //   width: 40,
-        //   height:30,
-        //   gap: 20,
-        //   direction: BluetoothTscPrinter.DIRECTION.FORWARD,
-        //   reference: [0, 0],
-        //   tear: BluetoothTscPrinter.TEAR.ON,
-        //   text: [
-        //     {
-        //       text: textToPrint,
-        //       x: 20, // Adjust the X position
-        //       y: 20, // Adjust the Y position
-        //       fonttype: BluetoothTscPrinter.FONTTYPE.FONT_1,
-        //       rotation: BluetoothTscPrinter.ROTATION.ROTATION_0,
-        //       xscal: BluetoothTscPrinter.FONTMUL.MUL_1,
-        //       yscal: BluetoothTscPrinter.FONTMUL.MUL_1,
-        //     },{
-        //       text: "Item 2                                                                  ",
-        //       x: 20,
-        //       y: 50,
-        //       fonttype: BluetoothTscPrinter.FONTTYPE.SIMPLIFIED_CHINESE,
-        //       rotation: BluetoothTscPrinter.ROTATION.ROTATION_0,
-        //       xscal:BluetoothTscPrinter.FONTMUL.MUL_1,
-        //       yscal: BluetoothTscPrinter.FONTMUL.MUL_1
-        //   }
-        //   ],
-        //   qrcode: [{x: 20, y: 96, level: BluetoothTscPrinter.EEC.LEVEL_L, width: 3, rotation: BluetoothTscPrinter.ROTATION.ROTATION_0, code: 'show me the money'}],
-        //   barcode: [{x: 120, y:96, type: BluetoothTscPrinter.BARCODETYPE.CODE128, height: 40, readable: 1, rotation: BluetoothTscPrinter.ROTATION.ROTATION_0, code: '1234567890                                                                                                   '}],
-        // });
-        BluetoothEscposPrinter.printerAlign(BluetoothEscposPrinter.ALIGN.CENTER);
-BluetoothEscposPrinter.setBlob(0);
-BluetoothEscposPrinter.printText("广州俊烨\n\r", {
-  encoding: 'GBK',
-  codepage: 0,
-  widthtimes: 3,
-  heigthtimes: 3,
-  fonttype: 1
-});
-BluetoothEscposPrinter.setBlob(0);
-BluetoothEscposPrinter.printText("销售单\n\r", {
-  encoding: 'GBK',
-  codepage: 0,
-  widthtimes: 0,
-  heigthtimes: 0,
-  fonttype: 1
-});
-BluetoothEscposPrinter.printerAlign(BluetoothEscposPrinter.ALIGN.LEFT);
-BluetoothEscposPrinter.printText("客户：零售客户\n\r", {});
-BluetoothEscposPrinter.printText("单号：xsd201909210000001\n\r", {});
-BluetoothEscposPrinter.printText("销售员：18664896621\n\r", {});
-BluetoothEscposPrinter.printText("--------------------------------\n\r", {});
-let columnWidths = [12, 6, 6, 8];
-BluetoothEscposPrinter.printColumn(columnWidths, [
-  BluetoothEscposPrinter.ALIGN.LEFT,
-  BluetoothEscposPrinter.ALIGN.CENTER,
-  BluetoothEscposPrinter.ALIGN.CENTER,
-  BluetoothEscposPrinter.ALIGN.RIGHT
-], ["商品", '数量', '单价', '金额'], {});
-BluetoothEscposPrinter.printColumn(columnWidths, [
-  BluetoothEscposPrinter.ALIGN.LEFT,
-  BluetoothEscposPrinter.ALIGN.LEFT,
-  BluetoothEscposPrinter.ALIGN.CENTER,
-  BluetoothEscposPrinter.ALIGN.RIGHT
-], ["React-Native定制开发我是比较长的位置你稍微看看是不是这样?", '1', '32000', '32000'], {});
-BluetoothEscposPrinter.printText("\n\r", {});
-BluetoothEscposPrinter.printColumn(columnWidths, [
-  BluetoothEscposPrinter.ALIGN.LEFT,
-  BluetoothEscposPrinter.ALIGN.LEFT,
-  BluetoothEscposPrinter.ALIGN.CENTER,
-  BluetoothEscposPrinter.ALIGN.RIGHT
-], ["React-Native定制开发我是比较长的位置你稍微看看是不是这样?", '1', '32000', '32000'], {});
-BluetoothEscposPrinter.printText("\n\r", {});
-BluetoothEscposPrinter.printText("--------------------------------\n\r", {});
-BluetoothEscposPrinter.printColumn([12, 8, 12], [
-  BluetoothEscposPrinter.ALIGN.LEFT,
-  BluetoothEscposPrinter.ALIGN.LEFT,
-  BluetoothEscposPrinter.ALIGN.RIGHT
-], ["合计", '2', '64000'], {});
-BluetoothEscposPrinter.printText("\n\r", {});
-BluetoothEscposPrinter.printText("折扣率：100%\n\r", {});
-BluetoothEscposPrinter.printText("折扣后应收：64000.00\n\r", {});
-BluetoothEscposPrinter.printText("会员卡支付：0.00\n\r", {});
-BluetoothEscposPrinter.printText("积分抵扣：0.00\n\r", {});
-BluetoothEscposPrinter.printText("支付金额：64000.00\n\r", {});
-BluetoothEscposPrinter.printText("结算账户：现金账户\n\r", {});
-BluetoothEscposPrinter.printText("备注：无\n\r", {});
-BluetoothEscposPrinter.printText("快递单号：无\n\r", {});
-BluetoothEscposPrinter.printText("--------------------------------\n\r", {});
-BluetoothEscposPrinter.printText("电话：\n\r", {});
-BluetoothEscposPrinter.printText("地址:\n\r\n\r", {});
-BluetoothEscposPrinter.printerAlign(BluetoothEscposPrinter.ALIGN.CENTER);
-BluetoothEscposPrinter.printText("欢迎下次光临\n\r\n\r\n\r", {});
-BluetoothEscposPrinter.printerAlign(BluetoothEscposPrinter.ALIGN.LEFT);
-
+        const textToPrint = "Hello from WFP!";
+        BluetoothTscPrinter.printLabel({
+          width: 40,
+          height:30,
+          gap: 20,
+          direction: BluetoothTscPrinter.DIRECTION.FORWARD,
+          reference: [0, 0],
+          tear: BluetoothTscPrinter.TEAR.ON,
+          text: [
+            {
+              text: textToPrint,
+              x: 20, // Adjust the X position
+              y: 20, // Adjust the Y position
+              fonttype: BluetoothTscPrinter.FONTTYPE.FONT_1,
+              rotation: BluetoothTscPrinter.ROTATION.ROTATION_0,
+              xscal: BluetoothTscPrinter.FONTMUL.MUL_1,
+              yscal: BluetoothTscPrinter.FONTMUL.MUL_1,
+            },{
+              text: 'Item 2',
+              x: 20,
+              y: 50,
+              fonttype: BluetoothTscPrinter.FONTTYPE.SIMPLIFIED_CHINESE,
+              rotation: BluetoothTscPrinter.ROTATION.ROTATION_0,
+              xscal:BluetoothTscPrinter.FONTMUL.MUL_1,
+              yscal: BluetoothTscPrinter.FONTMUL.MUL_1
+          }
+          ],
+          qrcode: [{x: 20, y: 96, level: BluetoothTscPrinter.EEC.LEVEL_L, width: 3, rotation: BluetoothTscPrinter.ROTATION.ROTATION_0, code: 'show me the money'}],
+          barcode: [{x: 120, y:96, type: BluetoothTscPrinter.BARCODETYPE.CODE128, height: 40, readable: 1, rotation: BluetoothTscPrinter.ROTATION.ROTATION_0, code: '1234567890'}],
+        });
         // Notify the user that printing is complete
         Alert.alert('Printing successful');
       },
@@ -438,6 +426,7 @@ BluetoothEscposPrinter.printerAlign(BluetoothEscposPrinter.ALIGN.LEFT);
           />
         </Stack.Navigator>
       </NavigationContainer>
+      <Button title="Test Printer" onPress={onPress} />
       <Button title="Check Bluetooth Status" onPress={checkBluetoothStatus} />
       <Button title="Enable Bluetooth" onPress={enableBluetooth} />
       <Button title="Scan for Devices" onPress={() => {
@@ -485,6 +474,10 @@ export default App;
 // Function to request the BLUETOOTH_CONNECT permission
 const requestBluetoothConnectPermission = async () => {
   try {
+        if (Platform.OS === 'android') {
+          console.log(Platform.OS);
+      if (Platform.Version >30) {
+        console.log(Platform.Version);
     const granted = await PermissionsAndroid.request(
       PermissionsAndroid.PERMISSIONS.BLUETOOTH_CONNECT,
       {
@@ -498,7 +491,27 @@ const requestBluetoothConnectPermission = async () => {
     } else {
       console.log('Bluetooth Connect permission denied');
       return Promise.reject('Bluetooth Connect permission denied');
-    }
+    }} else { const requestBluetoothPermissions = async () => {
+      try {
+        const granted = await PermissionsAndroid.requestMultiple([
+          PermissionsAndroid.PERMISSIONS.BLUETOOTH,
+          PermissionsAndroid.PERMISSIONS.BLUETOOTH_ADMIN,
+        ]);
+        
+        if (
+          granted[PermissionsAndroid.PERMISSIONS.BLUETOOTH] === PermissionsAndroid.RESULTS.GRANTED &&
+          granted[PermissionsAndroid.PERMISSIONS.BLUETOOTH_ADMIN] === PermissionsAndroid.RESULTS.GRANTED
+        ) {
+          console.log('Bluetooth permissions granted');
+        } else {
+          console.log('Bluetooth permissions denied');
+          return Promise.reject('Bluetooth permissions denied');
+        }
+      } catch (err) {
+        console.warn(err);
+        return Promise.reject(err);
+      }
+    };}};
   } catch (err) {
     console.warn(err);
     return Promise.reject(err);

@@ -130,7 +130,7 @@ export default function CartPage({
           <Text style={styles.checkoutText}>Checkout</Text>
         )}
       </TouchableOpacity>
-      <TouchableOpacity
+            <TouchableOpacity
         style={styles.checkoutButton}
         onPress={handlePrintReceipt}
         disabled={totalPrice === 0 || totalPrice > amount || isLoading}

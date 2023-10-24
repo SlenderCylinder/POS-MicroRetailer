@@ -77,11 +77,12 @@ def enableProguardInReleaseBuilds = (findProperty('android.enableProguardInRelea
 def jscFlavor = 'org.webkit:android-jsc:+'
 
 android {
+    namespace "com.shagar123.microretailer"
+
     ndkVersion rootProject.ext.ndkVersion
 
     compileSdkVersion rootProject.ext.compileSdkVersion
 
-    namespace 'com.shagar123.microretailer'
     defaultConfig {
         applicationId 'com.shagar123.microretailer'
         minSdkVersion rootProject.ext.minSdkVersion
@@ -138,8 +139,7 @@ dependencies {
     // The version of react-native is set by the React Native Gradle Plugin
     implementation("com.facebook.react:react-android")
              //PX400
-    implementation(name: 'cloudpossdk-1.5.2', ext: 'aar')
-    implementation 'com.github.kenglxn.QRGen:android:2.6.0'
+    //implementation(name: 'cloudpossdk-1.5.2', ext: 'aar')
 
     def isGifEnabled = (findProperty('expo.gif.enabled') ?: "") == "true";
     def isWebpEnabled = (findProperty('expo.webp.enabled') ?: "") == "true";

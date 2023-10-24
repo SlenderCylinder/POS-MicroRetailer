@@ -104,10 +104,12 @@ export default function Loading({ navigation, retailer }) {
           navigation.navigate("Home");
         }
       } else {
-        setShowRetryButton(true);
+        //setShowRetryButton(true);
+        navigation.navigate("Retailer");
       }
     } catch (error) {
-      setShowRetryButton(true);
+      //setShowRetryButton(true);
+      navigation.navigate("Retailer");
     }
   };
 

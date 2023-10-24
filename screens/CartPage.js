@@ -13,6 +13,7 @@ import { useNavigation } from "@react-navigation/native";
 import { AntDesign } from "@expo/vector-icons";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { StatusBar } from 'react-native';
+import { BluetoothEscposPrinter } from 'react-native-bluetooth-escpos-printer'; // Import Bluetooth printing functions
 
 export default function CartPage({
   selectedBeneficiary,
@@ -31,6 +32,21 @@ export default function CartPage({
   const [isLoading, setIsLoading] = useState(false);
   const [isSuccess, setIsSuccess] = useState(false);
   const navigation = useNavigation();
+
+  const handlePrintReceipt = () => {
+    // Construct the receipt text
+    let receiptText = "Receipt:\n";
+    cartItems.forEach((item) => {
+      receiptText += `${item.name} x${item.quantity} - $${item.price * item.quantity}\n`;
+    });
+    receiptText += `Total: $${totalPrice.toFixed(2)}\n`;
+    receiptText += `Balance: $${(amount - totalPrice).toFixed(2)}`;
+
+    // Use the Bluetooth printing functions to print the receipt
+    BluetoothEscposPrinter.printText(receiptText, {}, () => {
+      Alert.alert("Printing successful");
+    });
+  };
 
   const handleCheckout = async () => {
 
@@ -113,6 +129,13 @@ export default function CartPage({
         ) : (
           <Text style={styles.checkoutText}>Checkout</Text>
         )}
+      </TouchableOpacity>
+      <TouchableOpacity
+        style={styles.checkoutButton}
+        onPress={handlePrintReceipt}
+        disabled={totalPrice === 0 || totalPrice > amount || isLoading}
+      >
+        <Text style={styles.checkoutText}>Print Receipt</Text>
       </TouchableOpacity>
       <Modal visible={isSuccess} animationType="slide" transparent={true}>
         <View style={styles.successContainer}>

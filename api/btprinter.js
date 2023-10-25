@@ -1,5 +1,6 @@
 // btprinter.js
 
+import { activeId } from '../App';
 import { Alert, ActivityIndicator, Text, FlatList, TouchableOpacity, View, DeviceEventEmitter, Platform, PermissionsAndroid } from 'react-native';
 import {
   BluetoothManager,
@@ -30,8 +31,7 @@ const connectedListener = DeviceEventEmitter.addListener(
   const unableConnectListener = DeviceEventEmitter.addListener(
     BluetoothManager.EVENT_UNABLE_CONNECT,
     (error) => {
-      console.log('Error connecting to device:', error);
-      Alert.alert('Error connecting to device');
+      console.log('Error connecting to printer:', error);
       // Make sure to remove the listener to avoid memory leaks
       unableConnectListener.remove();
     }
@@ -214,10 +214,8 @@ const scanForDevices = async () => {
 
     BluetoothManager.connect(rowData) // the device address scanned.
     .then((s) => {
-        console.log(s);
-        Alert.alert(s);
-        // print();
-        const textToPrint = "Hello from WFP!";
+        console.log(s);        // print();
+        const textToPrint = "PRNT CON. OK";
         BluetoothTscPrinter.printLabel({
           width: 40,
           height:30,
@@ -234,26 +232,34 @@ const scanForDevices = async () => {
               rotation: BluetoothTscPrinter.ROTATION.ROTATION_0,
               xscal: BluetoothTscPrinter.FONTMUL.MUL_1,
               yscal: BluetoothTscPrinter.FONTMUL.MUL_1,
-            },{
-              text: 'Item 2',
-              x: 20,
-              y: 50,
-              fonttype: BluetoothTscPrinter.FONTTYPE.SIMPLIFIED_CHINESE,
-              rotation: BluetoothTscPrinter.ROTATION.ROTATION_0,
-              xscal:BluetoothTscPrinter.FONTMUL.MUL_1,
-              yscal: BluetoothTscPrinter.FONTMUL.MUL_1
-          }
-          ],
-          qrcode: [{x: 20, y: 96, level: BluetoothTscPrinter.EEC.LEVEL_L, width: 3, rotation: BluetoothTscPrinter.ROTATION.ROTATION_0, code: 'show me the money'}],
-          barcode: [{x: 120, y:96, type: BluetoothTscPrinter.BARCODETYPE.CODE128, height: 40, readable: 1, rotation: BluetoothTscPrinter.ROTATION.ROTATION_0, code: '1234567890'}],
+            },
+          ]
         });
         // Notify the user that printing is complete
-        Alert.alert('Printing successful');
       },
         // Perform your printing actions here
       (e) => {
-        console.log('Error connecting to device:', e);
-        Alert.alert('Error connecting to device');
+        console.log('Error connecting to printer:', e);
+        setTimeout(() => {
+        Alert.alert(
+            'Error connecting to printer',
+            'Retry connecting to the printer?',
+            [
+            {
+                text: 'Retry',
+                onPress: connectPrinter(activeId),
+                },
+              {
+                text: 'Cancel',
+                onPress: () => {
+                  // Handle cancel action if needed
+                  console.log('Printing canceled');
+                },
+                style: 'cancel',
+              },
+            ]
+          );
+        }, 1000);
       });
   };
 

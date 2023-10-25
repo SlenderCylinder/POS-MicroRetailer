@@ -11,28 +11,25 @@ import {
   ImageBackground,
 } from "react-native";
 import { AntDesign } from "@expo/vector-icons";
-
-export default function Card({ image, name, price, onAddToCart }) {
+export default function Card({ image, name, price, onAddToCart, unit, max, Rquantity }) {
   const [quantity, setQuantity] = useState(1);
   const [modalVisible, setModalVisible] = useState(false);
   const [newPrice, setNewPrice] = useState(price);
-
   const handleIncrement = () => {
-    setQuantity(quantity + 1);
+    if (quantity < max){
+      setQuantity(quantity + 1);
+    }
   };
-
   const handleDecrement = () => {
     if (quantity > 1) {
       setQuantity(quantity - 1);
     }
   };
-
   const handleAddToCartPress = () => {
     onAddToCart(name, quantity, newPrice);
     setQuantity(1); // Reset quantity to 1 after adding to cart
     setModalVisible(false); // Close the modal after adding to cart
   };
-
   const handlePriceChange = (text) => {
     if (text === "") {
       setNewPrice("");
@@ -43,7 +40,6 @@ export default function Card({ image, name, price, onAddToCart }) {
       }
     }
   };
-
   return (
     <TouchableOpacity
       style={styles.cardContainer}
@@ -65,7 +61,7 @@ export default function Card({ image, name, price, onAddToCart }) {
             <TouchableWithoutFeedback onPress={() => {}}>
               <View style={styles.modalContent}>
                 <Image source={{ uri: image }} style={styles.modalImage} />
-                <Text style={styles.modalName}>{name}</Text>
+                <Text style={styles.modalName}>{`${name} ${Rquantity}${unit}`}</Text>
                 <View style={styles.modalPriceQuantityContainer}>
                   <View style={styles.modalPriceContainer}>
                     <Text style={styles.modalPrice}>Rs {price}</Text>
@@ -106,7 +102,6 @@ export default function Card({ image, name, price, onAddToCart }) {
     </TouchableOpacity>
   );
 }
-
 const styles = StyleSheet.create({
   cardContainer: {
     width: "45%",

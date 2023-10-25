@@ -7,8 +7,6 @@ import Card from "../components/Card";
 import CartButton from "../components/CartButton";
 import { MaterialCommunityIcons } from "@expo/vector-icons";
 import { Menu, Divider } from "react-native-paper";
-import { StatusBar } from 'react-native';
-
 export default function BeneficiaryDetails({
   selectedBeneficiary,
   cartItems,
@@ -22,20 +20,14 @@ export default function BeneficiaryDetails({
   const amount = selectedBeneficiary ? selectedBeneficiary.amount : 0;
   const nic = selectedBeneficiary ? selectedBeneficiary.nic : 0;
   const [menuVisible, setMenuVisible] = useState(false);
-
-  StatusBar.setHidden(true);
-
   const handleCartPress = () => {
     navigation.navigate("Cart");
   };
-  
-
   // Show confirmation dialog when the user presses the back button
   useFocusEffect(
     React.useCallback(() => {
       const unsubscribe = navigation.addListener("beforeRemove", (e) => {
         e.preventDefault();
-
         Alert.alert(
           "Confirm",
           "Are you sure you want to go back?",
@@ -58,16 +50,13 @@ export default function BeneficiaryDetails({
           { cancelable: false }
         );
       });
-
       return unsubscribe;
     }, [navigation, setSelectedBeneficiary, setCartItems])
   );
-
   const handleLanguageChange = (lang) => {
     setLanguage(lang);
     setMenuVisible(false);
   };
-
   return (
     <View style={styles.container}>
       <LinearGradient colors={["#007DBC", "#6FB9E8"]} style={styles.card}>
@@ -120,6 +109,9 @@ export default function BeneficiaryDetails({
                 <Card
                   name={item[language]}
                   price={item.price}
+                  Rquantity={item.quantity}
+                  max={item.max}
+                  unit={item.unit}
                   image={item.image}
                   onAddToCart={handleAddToCart}
                 />
@@ -127,6 +119,9 @@ export default function BeneficiaryDetails({
                   <Card
                     name={items[index + 1][language]}
                     price={items[index + 1].price}
+                    Rquantity={items[index + 1].quantity}
+                    unit={items[index + 1].unit}
+                    max={items[index + 1].max}
                     image={items[index + 1].image}
                     onAddToCart={handleAddToCart}
                   />
@@ -144,7 +139,6 @@ export default function BeneficiaryDetails({
     </View>
   );
 }
-
 const styles = StyleSheet.create({
   container: {
     flex: 1,

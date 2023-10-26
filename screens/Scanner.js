@@ -7,13 +7,14 @@ import {
   ActivityIndicator,
   Animated,
   Alert,
+  ToastAndroid,
   Easing,
 } from "react-native";
 import { BarCodeScanner } from "expo-barcode-scanner";
 import { useNavigation } from "@react-navigation/native";
 import api from "../api/api";
 
-const Scanner = React.memo(({ setSelectedBeneficiary }) => {
+const Scanner = React.memo(({ setSelectedBeneficiary, retailerId }) => {
   const [hasPermission, setHasPermission] = useState(null);
   const [scanned, setScanned] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
@@ -24,15 +25,35 @@ const Scanner = React.memo(({ setSelectedBeneficiary }) => {
     (async () => {
       const { status } = await BarCodeScanner.requestPermissionsAsync();
       setHasPermission(status === "granted");
+      if (status == "granted"){
+        ToastAndroid.show('Position QR code in the middle', ToastAndroid.LONG);
+      } else {
+        ToastAndroid.show('Position allow Camera access', ToastAndroid.LONG);
+      }
     })();
+
   }, []);
 
   const handleBarCodeScanned = async ({ data }) => {
     try {
       const beneficiary = (await api.get(`/beneficiary/${data}`)).data;
       if (beneficiary) {
-        setSelectedBeneficiary(beneficiary);
-        navigation.navigate("BeneficiaryDetails");
+        console.log(`Text/PIN input is used to login. Used ID: ${data}`)
+        console.log("APK_Assigned_retailer:", retailerId)
+        console.log("Retailer assigned:", beneficiary.retailerAssigned);
+        if(beneficiary.retailerAssigned == retailerId){
+          setSelectedBeneficiary(beneficiary);
+          navigation.navigate("BeneficiaryDetails");
+        }
+        else if (beneficiary.id == "12345678"){
+          ToastAndroid.show('Skipping retailer check for test beneficiary', ToastAndroid.SHORT);
+          setSelectedBeneficiary(beneficiary);
+          navigation.navigate("BeneficiaryDetails");
+        }
+        else{
+          Alert.alert(`Beneficiary not assigned to this retailer.\nAssigned retailer: ${beneficiary.retailerAssigned}`)
+        }
+
       } else {
         Alert.alert("Beneficiary not found");
       }

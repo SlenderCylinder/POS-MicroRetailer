@@ -7,17 +7,18 @@ import Pin from "./screens/Pin";
 import BeneficiaryDetails from "./screens/BenDetails";
 import CartPage from "./screens/CartPage";
 import { NavigationContainer } from "@react-navigation/native";
-import { Provider as PaperProvider } from "react-native-paper";
 import Loading from "./screens/Loading";
-import Retailer from "./screens/Retailer";
 import LanguageSelectionScreen from "./screens/Lang";
 import { Alert, StatusBar } from 'react-native';
 import { DeviceEventEmitter } from 'react-native';
 const Stack = createStackNavigator();
 import {BluetoothManager} from 'react-native-bluetooth-escpos-printer';
 import { connectPrinter, requestBluetoothConnectPermission } from "./api/btprinter";
+import { getComodities } from "./api/comodities";
 
 let activeId = null;
+const retailerId = "0001";
+
 
 function App() {
   const [cartItems, setCartItems] = useState([]);
@@ -99,10 +100,22 @@ function App() {
 }, []);
 
 
+const keepAliveInterval = setInterval(() => {
+  try {
+    console.log("Sending printer wake up signal")
+    connectPrinter(activeId)
+  } catch (error) {
+    console.log("Keep-alive error: ", error);
+    clearInterval(keepAliveInterval);
+  }
+}, 2 * 60 * 1000);
 
-  const handleAddToCart = (name, quantity, price) => {
-    const newItem = { name, quantity, price };
+
+
+  const handleAddToCart = (name, quantity, price,id) => {
+    const newItem = { name, quantity, price ,id};
     setCartItems([...cartItems, newItem]);
+    console.log(cartItems)
   };
 
   const handleRemoveFromCart = (item) => {
@@ -152,7 +165,6 @@ function App() {
 
 
   return (
-    <PaperProvider>
       <NavigationContainer>
         <Stack.Navigator>
           <Stack.Screen name="Loading" options={{ headerShown: false }}>
@@ -160,7 +172,7 @@ function App() {
               <Loading
                 {...props}
                 lang={language}
-                retailer={retailer}
+                retailerId={retailerId}
                 setLanguage={setLanguage}
               />
             )}
@@ -172,17 +184,14 @@ function App() {
           />
           <Stack.Screen name="Pin">
             {(props) => (
-              <Pin {...props} setSelectedBeneficiary={setSelectedBeneficiary} />
+              <Pin {...props} retailerId= {retailerId} setSelectedBeneficiary={setSelectedBeneficiary} />
             )}
-          </Stack.Screen>
-          <Stack.Screen name="Retailer" options={{headerShown: false}}>
-            {(props) => <Retailer {...props} setRetailer={setRetailer} />}
           </Stack.Screen>
           <Stack.Screen name="Scanner">
             {(props) => (
               <Scanner
                 {...props}
-                setSelectedBeneficiary={setSelectedBeneficiary}
+                retailerId= {retailerId} setSelectedBeneficiary={setSelectedBeneficiary}
               />
             )}
           </Stack.Screen>
@@ -193,7 +202,7 @@ function App() {
                 cartItems={cartItems}
                 setSelectedBeneficiary={setSelectedBeneficiary}
                 setCartItems={setCartItems}
-                retailer={retailer}
+                retailerId={retailerId}
                 selectedBeneficiary={selectedBeneficiary}
                 handleRemoveFromCart={handleRemoveFromCart}
               />
@@ -224,13 +233,12 @@ function App() {
           />
         </Stack.Navigator>
       </NavigationContainer>
-    </PaperProvider>
   );
 }
 
 export default App;
 
-export { activeId };
+export { activeId, retailerId };
 
 
 

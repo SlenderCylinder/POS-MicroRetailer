@@ -1,6 +1,6 @@
 // This component is the PIN login screen. It is displayed when the user first launches the app.
 
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import {
   StyleSheet,
   Text,
@@ -9,24 +9,63 @@ import {
   TouchableOpacity,
   ActivityIndicator,
   Alert,
+  ToastAndroid
 } from "react-native";
 import { useNavigation } from "@react-navigation/native";
 import api from "../api/api";
 
-export default function Pin({ setSelectedBeneficiary }) {
+export default function Pin({ setSelectedBeneficiary, retailerId }) {
   const navigation = useNavigation();
   const [pin, setPin] = useState("");
   const [isLoading, setIsLoading] = useState(false);
+  const [retailerData, setRetailerData] = useState(null);
+
+  const fetchRetailerData = async (retailerId) => {
+    try {
+      const response = await api.get(`/retailer/${retailerId}`);
+      const data = response.data;
+      setRetailerData(data); // Save the data to the state
+    } catch (error) {
+      console.error("Error fetching retailer data: ", error);
+    }
+  };
+
+  // Use the effect hook to fetch retailer data when retailerId changes
+  useEffect(() => {
+    if (retailerId) {
+      fetchRetailerData(retailerId);
+    }
+  }, [retailerId])
+
 
   // When the user clicks the login button
   const handleLogin = async () => {
     setIsLoading(true);
+    if (pin === '12345678') {
+      ToastAndroid.show('This is a dummy account to be used for training purposes only', ToastAndroid.SHORT);
+    }
 
     try {
       const beneficiary = (await api.get(`/beneficiary/${pin}`)).data;
       if (beneficiary) {
-        setSelectedBeneficiary(beneficiary);
-        navigation.navigate("BeneficiaryDetails");
+        console.log(`Text/PIN input is used to login. Used ID: ${pin}`)
+        console.log("APK_Assigned_retailer:", retailerId)
+        console.log("Retailer assigned:", beneficiary.retailerAssigned);
+
+        if(beneficiary.retailerAssigned == retailerId){
+          setSelectedBeneficiary(beneficiary);
+          navigation.navigate("BeneficiaryDetails");
+        }
+        else if (beneficiary.id == "12345678"){
+          ToastAndroid.show('Skipping retailer check for test beneficiary', ToastAndroid.SHORT);
+          setSelectedBeneficiary(beneficiary);
+          navigation.navigate("BeneficiaryDetails");
+        }
+        else{
+          const beneficiaryRetailerdata = (await api.get(`/retailer/${beneficiary.retailerAssigned}`)).data;
+          console.log(beneficiaryRetailerdata)
+          Alert.alert(`Beneficiary not allowed to make purchases from this retailer.\nAssigned retailer: ${beneficiaryRetailerdata.name} - ${beneficiaryRetailerdata.gnDivision} (${beneficiary.retailerAssigned}) `)
+        }
       } else {
         Alert.alert("Beneficiary not found");
       }

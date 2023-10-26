@@ -180,7 +180,7 @@ const scanForDevices = async () => {
 // };
 
 
-    const connectToDevice = (device) => {
+    const connectToDevice = (paireddevice) => {
         console.log("Attempting to connect to the following device:")
         try {
 
@@ -215,26 +215,26 @@ const scanForDevices = async () => {
     BluetoothManager.connect(rowData) // the device address scanned.
     .then((s) => {
         console.log(s);        // print();
-        const textToPrint = "PRNT CON. OK";
-        BluetoothTscPrinter.printLabel({
-          width: 40,
-          height:30,
-          gap: 20,
-          direction: BluetoothTscPrinter.DIRECTION.FORWARD,
-          reference: [0, 0],
-          tear: BluetoothTscPrinter.TEAR.ON,
-          text: [
-            {
-              text: textToPrint,
-              x: 20, // Adjust the X position
-              y: 20, // Adjust the Y position
-              fonttype: BluetoothTscPrinter.FONTTYPE.FONT_1,
-              rotation: BluetoothTscPrinter.ROTATION.ROTATION_0,
-              xscal: BluetoothTscPrinter.FONTMUL.MUL_1,
-              yscal: BluetoothTscPrinter.FONTMUL.MUL_1,
-            },
-          ]
-        });
+        // const textToPrint = "PRNT CON. OK";
+        // BluetoothTscPrinter.printLabel({
+        //   width: 40,
+        //   height:30,
+        //   gap: 20,
+        //   direction: BluetoothTscPrinter.DIRECTION.FORWARD,
+        //   reference: [0, 0],
+        //   tear: BluetoothTscPrinter.TEAR.ON,
+        //   text: [
+        //     {
+        //       text: textToPrint,
+        //       x: 20, // Adjust the X position
+        //       y: 20, // Adjust the Y position
+        //       fonttype: BluetoothTscPrinter.FONTTYPE.FONT_1,
+        //       rotation: BluetoothTscPrinter.ROTATION.ROTATION_0,
+        //       xscal: BluetoothTscPrinter.FONTMUL.MUL_1,
+        //       yscal: BluetoothTscPrinter.FONTMUL.MUL_1,
+        //     },
+        //   ]
+        // });
         // Notify the user that printing is complete
       },
         // Perform your printing actions here
@@ -259,7 +259,7 @@ const scanForDevices = async () => {
               },
             ]
           );
-        }, 1000);
+        }, 3000);
       });
   };
 

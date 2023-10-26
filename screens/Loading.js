@@ -98,18 +98,14 @@ export default function Loading({ navigation, retailer }) {
     try {
       const response = await fetch("https://www.google.com");
       if (response.ok) {
-        if (retailer === null) {
-          navigation.navigate("Retailer");
-        } else {
           navigation.navigate("Home");
-        }
       } else {
         //setShowRetryButton(true);
-        navigation.navigate("Retailer");
+        navigation.navigate("Pin");
       }
     } catch (error) {
       //setShowRetryButton(true);
-      navigation.navigate("Retailer");
+      navigation.navigate("Pin");
     }
   };
 

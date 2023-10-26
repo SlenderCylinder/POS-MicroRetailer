@@ -1,5 +1,12 @@
 import { registerRootComponent } from 'expo';
+import { AppRegistry, YellowBox, LogBox } from 'react-native';
 
+LogBox.ignoreLogs([
+  'Some warning message to ignore',
+  // Add other warning messages to ignore here
+]);
+
+  
 import App from './App';
 
 // registerRootComponent calls AppRegistry.registerComponent('main', () => App);

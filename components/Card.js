@@ -11,25 +11,40 @@ import {
   ImageBackground,
 } from "react-native";
 import { AntDesign } from "@expo/vector-icons";
-export default function Card({ image, name, price, onAddToCart, unit, max, Rquantity }) {
-  const [quantity, setQuantity] = useState(1);
+
+export default function Card({
+  image,
+  name,
+  price,
+  onAddToCart,
+  unit,
+  max,
+  Rquantity,
+  exist,
+  id,
+}) {
+  const [quantity, setQuantity] = useState(max);
   const [modalVisible, setModalVisible] = useState(false);
   const [newPrice, setNewPrice] = useState(price);
+
   const handleIncrement = () => {
-    if (quantity < max){
+    if (quantity < max) {
       setQuantity(quantity + 1);
     }
   };
+
   const handleDecrement = () => {
     if (quantity > 1) {
       setQuantity(quantity - 1);
     }
   };
+
   const handleAddToCartPress = () => {
-    onAddToCart(name, quantity, newPrice);
+    onAddToCart(name, quantity, newPrice, id);
     setQuantity(1); // Reset quantity to 1 after adding to cart
     setModalVisible(false); // Close the modal after adding to cart
   };
+
   const handlePriceChange = (text) => {
     if (text === "") {
       setNewPrice("");
@@ -40,14 +55,19 @@ export default function Card({ image, name, price, onAddToCart, unit, max, Rquan
       }
     }
   };
+
   return (
     <TouchableOpacity
-      style={styles.cardContainer}
+      style={[
+        styles.cardContainer,
+        exist && styles.cardContainerDisabled, // Add a conditional style to disable the card
+      ]}
       onPress={() => setModalVisible(true)}
+      disabled={exist} // Disable the card when exist is true
     >
       <ImageBackground source={{ uri: image }} style={styles.image}>
         <View style={styles.overlay}>
-          <Text style={styles.name}>{name}</Text>
+          <Text style={styles.name}>{`${id} . ${name}`}</Text>
         </View>
       </ImageBackground>
       <Modal
@@ -88,10 +108,21 @@ export default function Card({ image, name, price, onAddToCart, unit, max, Rquan
                   />
                 </View>
                 <TouchableOpacity
-                  style={styles.modalCartButton}
-                  onPress={handleAddToCartPress}
+                  style={[
+                    styles.modalCartButton,
+                    exist && styles.modalCartButtonDisabled,
+                  ]}
+                  onPress={exist ? null : handleAddToCartPress}
+                  disabled={exist}
                 >
-                  <Text style={styles.modalCartButtonText}>Add to cart</Text>
+                  <Text
+                    style={[
+                      styles.modalCartButtonText,
+                      exist && styles.modalCartButtonTextDisabled,
+                    ]}
+                  >
+                    Add to cart
+                  </Text>
                   <AntDesign name="shoppingcart" size={24} color="#ffffff" />
                 </TouchableOpacity>
               </View>
@@ -102,6 +133,7 @@ export default function Card({ image, name, price, onAddToCart, unit, max, Rquan
     </TouchableOpacity>
   );
 }
+
 const styles = StyleSheet.create({
   cardContainer: {
     width: "45%",
@@ -115,6 +147,9 @@ const styles = StyleSheet.create({
     shadowRadius: 4,
     elevation: 3,
     marginBottom: 10,
+  },
+  cardContainerDisabled: {
+    opacity: 0.5, // Reduce the opacity of the card to make it look disabled
   },
   image: {
     width: "100%",
@@ -225,15 +260,21 @@ const styles = StyleSheet.create({
     alignItems: "center",
     justifyContent: "center",
     backgroundColor: "#ff6b6b",
-    borderRadius: 5,
-    paddingHorizontal: 10,
-    paddingVertical: 5,
-    marginTop: 10,
+    borderRadius: 10, // Increase the border radius for a rounded look
+    paddingHorizontal: 20, // Increase the horizontal padding
+    paddingVertical: 25, // Increase the vertical padding
+    marginTop: 20,
+  },
+  modalCartButtonDisabled: {
+    backgroundColor: "#cccccc",
   },
   modalCartButtonText: {
     color: "#ffffff",
     fontSize: 16,
     fontWeight: "bold",
     marginRight: 10,
+  },
+  modalCartButtonTextDisabled: {
+    color: "#999999",
   },
 });

@@ -3,13 +3,13 @@ import { View, Text, StyleSheet, TouchableOpacity } from "react-native";
 import { MaterialIcons } from "@expo/vector-icons";
 
 export default function CheckoutItem({ item, handleRemoveFromCart }) {
-  const { name, quantity, price } = item;
+  const { name, quantity, price,id } = item;
   const total = quantity * price;
 
   return (
     <View style={styles.container}>
       <View style={styles.itemDetails}>
-        <Text style={styles.itemName}>{name}</Text>
+        <Text style={styles.itemName}>{`${id}. ${name}`}</Text>
         <Text style={styles.itemQuantity}>x {quantity}</Text>
       </View>
       <View style={styles.itemPrice}>

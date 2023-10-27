@@ -7,6 +7,7 @@ import Pin from "./screens/Pin";
 import BeneficiaryDetails from "./screens/BenDetails";
 import CartPage from "./screens/CartPage";
 import { NavigationContainer } from "@react-navigation/native";
+import { Provider as PaperProvider } from "react-native-paper";
 import Loading from "./screens/Loading";
 import LanguageSelectionScreen from "./screens/Lang";
 import { Alert, StatusBar } from 'react-native';
@@ -22,47 +23,17 @@ const retailerId = "0001";
 
 function App() {
   const [cartItems, setCartItems] = useState([]);
+  const [pairedDevices, setpairedDevices] = useState([]);
   const [selectedBeneficiary, setSelectedBeneficiary] = useState(null);
   const [language, setLanguage] = useState("tam");
   const [retailer, setRetailer] = useState(null);
   const [isScanning, setIsScanning] = useState(false);
   const [activedeviceId, setActivedeviceId] = useState(null);
 
+
  
   StatusBar.setTranslucent(true);
   StatusBar.setBackgroundColor('rgba(0, 0, 0, 0.2)');
-
-
-  useEffect(() => {
-    const enableBluetooth = async () => {
-      try {
-        // Request the BLUETOOTH_CONNECT permission
-        await requestBluetoothConnectPermission();
-  
-        // Permission granted, enable Bluetooth
-        await BluetoothEnable();
-        
-        //Check for already paired devices
-        if (paired.length > 0) {
-          const firstDevice = paired[0];
-          activeId = firstDevice.address;
-          setActivedeviceId(activeId); 
-          console.log("activedeviceId:", activeId);
-          if (activeId){
-            connectPrinter(activeId)
-          }
-        } else {
-          console.log("No paired devices found.");
-        }
-      } catch (error) {
-        Alert.alert('Bluetooth Connect Permission Denied');
-        console.log('Bluetooth Connect Permission Denied:', error);
-      }
-    };
-  
-    enableBluetooth();
-  }, [])
-
 
   useEffect(() => {
     const deviceFoundListener = DeviceEventEmitter.addListener(
@@ -77,8 +48,7 @@ function App() {
   const deviceAlreadyPairedListener = DeviceEventEmitter.addListener(
     BluetoothManager.EVENT_DEVICE_ALREADY_PAIRED,
     (devices) => {
-      console.log("Already paired devices:")
-      console.log(devices);
+      console.log("Emitted", devices)
     }
   );
 
@@ -100,22 +70,11 @@ function App() {
 }, []);
 
 
-const keepAliveInterval = setInterval(() => {
-  try {
-    console.log("Sending printer wake up signal")
-    connectPrinter(activeId)
-  } catch (error) {
-    console.log("Keep-alive error: ", error);
-    clearInterval(keepAliveInterval);
-  }
-}, 2 * 60 * 1000);
 
-
-
-  const handleAddToCart = (name, quantity, price,id) => {
-    const newItem = { name, quantity, price ,id};
+  const handleAddToCart = (name, quantity, price,id, unit, Rquantity ) => {
+    const newItem = { name, quantity, price ,id, unit, Rquantity };
     setCartItems([...cartItems, newItem]);
-    console.log(cartItems)
+    console.log("Adding to cart :", cartItems)
   };
 
   const handleRemoveFromCart = (item) => {
@@ -128,21 +87,60 @@ const keepAliveInterval = setInterval(() => {
   const BluetoothEnable = async () => {
     try {
       const devices = await BluetoothManager.enableBluetooth();
+      console.log(devices)
+
       if (devices && devices.length > 0) {
         for (var i = 0; i < devices.length; i++) {
           try {
-            paired.push(JSON.parse(devices[i]));
+            paired.push(JSON.parse(devices[i]))
+
+            
           } catch (e) {
             console.log("Parsing error", e)
           }
         }
       }
       console.log("Paired devices:", paired);
+      console.log(paired[0].address)
+      activeId = paired[0].address
+      try {
+      connectPrinter(paired[0].address)
+      } catch(error) { console.log("PRINTER ERROR")}
+      paired = []
+      // if (paired.length > 0) {
+      //   for (const [deviceId, device] of paired) {
+      //     if (device.name === "DPP-250") {
+      //       activeId = device.id;
+      //       activeId = device.id.toString();
+      //       setActivedeviceId(activeId);
+      //       console.log("activedeviceId:", activeId);
+      //       if (activeId) {
+      //         connectPrinter(activeId);
+      //       }
+      //     }
+      //   }
+      // } else {
+      //   console.log("No paired devices found.");
+      // }
     } catch (error) {
       Alert.alert(error); 
     }
   };
 
+  const enableBluetoothInBackground = () => {
+    const interval = setInterval(() => {
+      console.log("Sending printer wake up signal")
+      BluetoothEnable();
+    }, 5 * 1000); // Run BluetoothEnable every 20 seconds
+
+    return () => {
+      clearInterval(interval); // Clear the interval when the component unmounts
+    };
+  };
+
+  useEffect(() => {
+    enableBluetoothInBackground(); // Start running BluetoothEnable in the background
+  }, []);
 
   useEffect(() => {
     const getLanguage = async () => {
@@ -165,6 +163,7 @@ const keepAliveInterval = setInterval(() => {
 
 
   return (
+    <PaperProvider>
       <NavigationContainer>
         <Stack.Navigator>
           <Stack.Screen name="Loading" options={{ headerShown: false }}>
@@ -233,6 +232,7 @@ const keepAliveInterval = setInterval(() => {
           />
         </Stack.Navigator>
       </NavigationContainer>
+    </PaperProvider>
   );
 }
 

@@ -1,7 +1,9 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useCallback } from "react";
+import { useFocusEffect } from "@react-navigation/native";
 import { Alert } from "react-native";
 import api from "../api/api";
-import { activeId } from "../App";
+import { activeId } from "../App"
+import { isPrinterOk } from "../api/btprinter";
 import {
   View,
   Text,
@@ -40,6 +42,29 @@ export default function CartPage({
   const navigation = useNavigation();
   const [assignedRetailer, setAssignedRetailer] = useState(null);
   const [items, setItems] = useState([]); 
+  const [isReceiptPrinted, setIsReceiptPrinted] = useState(false);
+  const [checkoutInitiated, setCheckoutInitiated] = useState(false);
+  const [CheckoutSuccess, setIsCheckoutSuccess] = useState(false);
+
+  useFocusEffect(
+    React.useCallback(() => {
+      if (checkoutInitiated) {
+        navigation.setOptions({
+          gestureEnabled: false, // Disable swipe gestures to navigate away
+        });
+      }
+    }));
+
+    useFocusEffect(
+      useCallback(() => {
+        const unsubscribe = navigation.addListener("beforeRemove", (e) => {
+          e.preventDefault();
+          Alert.alert("Not allowed:", "Transaction already processed. Please logout when done");
+        });
+        return unsubscribe;
+      }, [setIsCheckoutSuccess])
+    );
+  
 
   // Fetch items from the API and cache them
   useEffect(() => {
@@ -146,7 +171,6 @@ export default function CartPage({
 
       await fetchBeneficiaryBal();
       setIsLoading(false);
-      setIsSuccess(true);
 
 
       // Use the "amount" in your code as needed
@@ -164,6 +188,34 @@ export default function CartPage({
             heigthtimes: 0,
             fonttype: 1,
           });
+
+          // Set alignment to CENTER for the header
+          BluetoothEscposPrinter.printerAlign(BluetoothEscposPrinter.ALIGN.CENTER);
+          BluetoothEscposPrinter.setBlob(0);
+        
+          // Print the header
+          BluetoothEscposPrinter.printText("Mini\n\r", {
+            encoding: 'GBK',
+            codepage: 0,
+            widthtimes: 0,
+            heigthtimes: 0,
+            fonttype: 1,
+          });
+
+          
+          // Set alignment to CENTER for the header
+          BluetoothEscposPrinter.printerAlign(BluetoothEscposPrinter.ALIGN.CENTER);
+          BluetoothEscposPrinter.setBlob(0);
+        
+          // Print the header
+          BluetoothEscposPrinter.printText("Food-City\n\r", {
+            encoding: 'GBK',
+            codepage: 0,
+            widthtimes: 0,
+            heigthtimes: 0,
+            fonttype: 1,
+          });
+                  
         
           // Print "Receipt" text
           BluetoothEscposPrinter.printerAlign(BluetoothEscposPrinter.ALIGN.CENTER);
@@ -199,42 +251,65 @@ export default function CartPage({
           // Print a separator line
           BluetoothEscposPrinter.printText("--------------------------------\n\r", {});
         
-          // Define column widths for the item details
-          let columnWidths = [16, 6, 8]; 
-
-          // Print column headers
-          BluetoothEscposPrinter.printColumn(columnWidths,
-            [BluetoothEscposPrinter.ALIGN.LEFT, BluetoothEscposPrinter.ALIGN.CENTER, BluetoothEscposPrinter.ALIGN.RIGHT], // Remove the alignment for the "Amount" column
-            ["Item", "Qty", "Price"], {});
-          BluetoothEscposPrinter.printColumn([16, 6, 8], 
-            [BluetoothEscposPrinter.ALIGN.LEFT, BluetoothEscposPrinter.ALIGN.LEFT, BluetoothEscposPrinter.ALIGN.RIGHT],
-            ["----", "----", "----"], { encoding: 'UTF8', codepage: 11,}); 
+          BluetoothEscposPrinter.printColumn(
+            [16, 7, 9], // Adjust column widths as needed
+            [
+              BluetoothEscposPrinter.ALIGN.LEFT,
+              BluetoothEscposPrinter.ALIGN.CENTER,
+              BluetoothEscposPrinter.ALIGN.RIGHT,
+            ],
+            ["Item", "Qty", "Amount"], // Column headers
+            {}
+          );
           
+          // Print an empty line
           BluetoothEscposPrinter.printText("\n\r", {});
-
-        
-          // Loop through cart items and print each item's details
+          
+          // Loop through cart items and print each item's details, including the unit and amount
           cartItems.forEach((item) => {
             const itemEng = items.find(i => i.tam === item.name) || items.find(i => i.sin === item.name);
             const itemName = itemEng ? (itemEng.eng || itemEng.sin) : item.name;
-            BluetoothEscposPrinter.printColumn(columnWidths,
-              [BluetoothEscposPrinter.ALIGN.LEFT, BluetoothEscposPrinter.ALIGN.LEFT, BluetoothEscposPrinter.ALIGN.RIGHT], // Remove the alignment for the "Amount" column
-              [itemName.toString(), item.quantity.toString(), item.price.toString()], {
+            const unit = item.unit || '';
+            const itemquantity = (item.Rquantity*item.quantity);
+            const amount = (item.price * item.quantity).toFixed(2); // Calculate the total amount for the item
+            BluetoothEscposPrinter.printColumn(
+              [16, 7, 9], // Adjust column widths as needed
+              [
+                BluetoothEscposPrinter.ALIGN.LEFT,
+                BluetoothEscposPrinter.ALIGN.CENTER,
+                BluetoothEscposPrinter.ALIGN.RIGHT,
+              ],
+              [itemName.toString(), `${itemquantity}${unit}`, amount], {
                 encoding: 'UTF8'
-              });
+              }
+            );
           });
-        
+          
           // Print an empty line
           BluetoothEscposPrinter.printText("\n\r", {});
-        
-          // Calculate and print the total
+          
+          // Calculate and print the total quantity and total amount
+          let totalQuantity = 0;
           let totalAmount = 0;
+          const totalItems = cartItems.length;
+          
           cartItems.forEach((item) => {
+            totalQuantity += item.quantity;
             totalAmount += item.price * item.quantity;
           });
-          BluetoothEscposPrinter.printColumn([21, 8], 
-            [BluetoothEscposPrinter.ALIGN.LEFT, BluetoothEscposPrinter.ALIGN.RIGHT],
-            ["Total", totalAmount.toString()], { encoding: 'UTF8', codepage: 11,});
+          
+          BluetoothEscposPrinter.printColumn(
+            [16, 7, 9], // Adjust column widths as needed
+            [
+              BluetoothEscposPrinter.ALIGN.LEFT,
+              BluetoothEscposPrinter.ALIGN.CENTER,
+              BluetoothEscposPrinter.ALIGN.RIGHT,
+            ],
+            ["Total", totalItems.toString(), totalAmount.toFixed(2)], {
+              encoding: 'UTF8',
+              codepage: 11,
+            }
+          );          
 
 
           BluetoothEscposPrinter.printText("\n\r", {});
@@ -288,6 +363,13 @@ export default function CartPage({
 
   const handleCheckout = async () => {
 
+    setCheckoutInitiated(true)
+
+    navigation.setOptions({
+      gestureEnabled: false,
+    });
+
+
     setloadingState("Processing")
 
     let retryCount = 0;
@@ -296,34 +378,13 @@ export default function CartPage({
 
 
     setIsLoading(true);
-
-    if (activeId) {
-      try {
-        await connectPrinter(activeId);
-        await delay(3000); // Wait for the printer connection
-      } catch (error) {
-        console.log("Printer error:", error);
-        Alert.alert("Printer disconnected. Check printer");
-        setIsLoading(false);
-        return; // Stop execution if there's a printer error
-      }
-    } else {
-      console.log("No paired devices found.");
-      Alert.alert("Printer disconnected. Check printer");
-      setIsLoading(false);
-      return; // Stop execution if there are no paired devices
-    }
     
-    
-    try {
-      setloadingState("Pushing data");
-      await api
-        .post("/beneficiaries/updateCart", { cartItems, id, retailer })
-        .then(async (response) => {
-          setTimeout(async () => {
-            setloadingState("Printing");
+    if (isReceiptPrinted) {
             try {
+              setloadingState("Reprinting");
               await handlePrintReceipt();
+              setIsLoading(false);
+              Alert.alert("Receipt reprinted.")
             } catch (printError) {
               console.error("Error printing receipt:", printError);
               if (retryCount < 5) {
@@ -336,19 +397,61 @@ export default function CartPage({
                 return;
               }
             }
-            // Introduce a 2-second delay before setting the loading state back to false
-            await new Promise((resolve) => setTimeout(resolve, 2000));
-            setIsLoading(false);
-          }, 4000);
-          handleRemoveFromCart(null);
-        })
-        .catch((error) => {
-          setIsLoading(false);
-          console.error(error);
-        });
-    } catch (error) {
-      console.error(error);
-    }
+          } else {
+            try {
+              setloadingState("Pushing data");
+              await api
+                .post("/beneficiaries/updateCart", { cartItems, id, retailer })
+                .then(async (response) => {
+                  setTimeout(async () => {
+                    setloadingState("Printing");
+                    setIsReceiptPrinted(true);
+                    if (isPrinterOk) {
+                      try {
+                        await connectPrinter(activeId);
+                        await delay(3000); // Wait for the printer connection
+                      } catch (error) {
+                        console.log("Printer error:", error);
+                        Alert.alert("Printer disconnected. Check printer and reprint");
+                        setIsLoading(false);
+                        return; // Stop execution if there's a printer error
+                      }
+                    } else {
+                      console.log("No paired devices found.");
+                      Alert.alert("Printer disconnected. Check printer and reprint");
+                      setIsLoading(false);
+                      setIsCheckoutSuccess(true);
+                      return; // Stop execution if there are no paired devices
+                    }
+                    try {
+                      await handlePrintReceipt();
+                      setIsCheckoutSuccess(true);
+                      Alert.alert("Order placed successfully!") 
+                    } catch (printError) {
+                      console.error("Error printing receipt:", printError);
+                      if (retryCount < 5) {
+                        console.log("Retrying");
+                        retryCount++;
+                        // You can add more retries or other logic here.
+                      } else {
+                        console.error("Printing failed after multiple retries.");
+                        setIsLoading(false);
+                        return;
+                      }
+                    }
+                    // Introduce a 2-second delay before setting the loading state back to false
+                    await new Promise((resolve) => setTimeout(resolve, 2000));
+                    setIsLoading(false);
+                  }, 4000);
+                  handleRemoveFromCart(null);
+                })
+                .catch((error) => {
+                  console.error(error);
+                });
+            } catch (error) {
+              console.error(error);
+            }       
+      }
   };
 
   const handleCloseSuccess = () => {
@@ -357,6 +460,15 @@ export default function CartPage({
     setSelectedBeneficiary(null);
     setCartItems([]);
   };
+
+  const handleReprintReceipt = async () => {
+    setIsLoading(true)
+    handleCheckout()
+  };
+
+  const handleLogoutPress = async () => {
+    setIsSuccess(true);
+  }
 
 
   useEffect(() => {
@@ -383,8 +495,9 @@ export default function CartPage({
       {cartItems.map((item) => (
         <CheckoutItem
           key={`${item.name}-${item.quantity}`}
-          handleRemoveFromCart={handleRemoveFromCart}
+          handleRemoveFromCart={checkoutInitiated ? null : handleRemoveFromCart}
           item={item}
+          removable={!checkoutInitiated}
         />
       ))}
       <View style={styles.totalContainer}>
@@ -404,7 +517,7 @@ export default function CartPage({
             : null,
           isLoading ? styles.loadingButton : null,
         ]}
-        onPress={handleCheckout}
+        onPress={checkoutInitiated ? handleReprintReceipt : handleCheckout}
         disabled={totalPrice === 0 || totalPrice > amount || isLoading}
       >
         {isLoading ? (
@@ -413,16 +526,35 @@ export default function CartPage({
             <Text style={styles.loadingText}>{loadingState}</Text>
           </View>
         ) : (
-          <Text style={styles.checkoutText}>Checkout & Print</Text>
+          <Text style={styles.checkoutText}>
+            {checkoutInitiated ? "Reprint" : "Checkout & Print"}
+          </Text>
         )}
       </TouchableOpacity>
+      {CheckoutSuccess && (
+          <View style={styles.logoutContainer}>
+            <TouchableOpacity
+              style={styles.logoutButton}
+              onPress={handleCloseSuccess}
+              
+            >
+              <Text style={styles.logoutText}>Logout</Text>
+            </TouchableOpacity>
+          </View>
+        )}
       <Modal visible={isSuccess} animationType="slide" transparent={true}>
         <View style={styles.successContainer}>
           <AntDesign name="checkcircle" size={64} color="green" />
-          <Text style={styles.successText}>Order placed successfully!</Text>
-          <TouchableOpacity onPress={handleCloseSuccess}>
-            <Text style={styles.closeText}>Logout</Text>
-          </TouchableOpacity>
+          <Text style={styles.successText}>Thank you!</Text>
+          <TouchableOpacity
+              style={[
+                styles.checkoutButton, // Use the same styles as the "Checkout & Print" button
+                isLoading ? styles.loadingButton : null,
+              ]}
+              onPress={handleCloseSuccess}
+            >
+              <Text style={styles.checkoutText}>Logout</Text>
+            </TouchableOpacity>
         </View>
       </Modal>
       </View>
@@ -454,6 +586,13 @@ const styles = StyleSheet.create({
     padding: 10,
     borderRadius: 5,
     marginTop: 20,
+  },
+  logoutButton: {
+    backgroundColor: "#ff0000",
+    padding: 10,
+    borderRadius: 5,
+    marginTop: 20,
+    justifyContent: 'center'
   },
   checkoutText: {
     color: "#ffffff",
@@ -505,12 +644,26 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center', 
   },
+  logoutContainer: {
+    color: '#ff0000',
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center', 
+  },
   loadingText: {
     color: '#ffffff',
     fontSize: 20,
     fontWeight: 'bold',
-    marginLeft: 10, 
+    marginLeft: 10,
+    textAlign: 'center',
   },
+  logoutText: {
+    color: '#ffffff',
+    fontSize: 20,
+    fontWeight: 'bold',
+    textAlign: 'center', 
+  },
+
 });
 
 function delay(ms) {

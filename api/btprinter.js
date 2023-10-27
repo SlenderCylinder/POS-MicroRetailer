@@ -11,6 +11,8 @@ import {
 let foundDevicesCallback = null;
 let pairedDevicesCallback = null;
 let setIsScanningCallback = null;
+let isPrinterOk = null;
+
 
 const setDevicesCallbacks = (foundDevices, pairedDevices, setIsScanning ) => {
   foundDevicesCallback = foundDevices;
@@ -214,7 +216,8 @@ const scanForDevices = async () => {
 
     BluetoothManager.connect(rowData) // the device address scanned.
     .then((s) => {
-        console.log(s);        // print();
+         isPrinterOk = true;
+        // console.log(s);        // print();
         // const textToPrint = "PRNT CON. OK";
         // BluetoothTscPrinter.printLabel({
         //   width: 40,
@@ -235,30 +238,12 @@ const scanForDevices = async () => {
         //     },
         //   ]
         // });
-        // Notify the user that printing is complete
       },
         // Perform your printing actions here
       (e) => {
+        isPrinterOk = false;
         console.log('Error connecting to printer:', e);
         setTimeout(() => {
-        Alert.alert(
-            'Error connecting to printer',
-            'Retry connecting to the printer?',
-            [
-            {
-                text: 'Retry',
-                onPress: connectPrinter(activeId),
-                },
-              {
-                text: 'Cancel',
-                onPress: () => {
-                  // Handle cancel action if needed
-                  console.log('Printing canceled');
-                },
-                style: 'cancel',
-              },
-            ]
-          );
         }, 3000);
       });
   };
@@ -266,6 +251,7 @@ const scanForDevices = async () => {
 
 export {
   enableBluetooth,
+  isPrinterOk,
   BluetoothCheck,
   BluetoothEnable,
   scanForDevices,

@@ -22,11 +22,28 @@ export default function Pin({ setSelectedBeneficiary, retailerId }) {
 
   const fetchRetailerData = async (retailerId) => {
     try {
-      const response = await api.get(`/retailer/${retailerId}`);
-      const data = response.data;
-      setRetailerData(data); // Save the data to the state
+      const response = await api.get("/retailers");
+      const retailers = response.data;
+      console.log("PIN PAGE: ",retailers)
+      console.log("PIN PAGE: ",retailerId)
+
+      const assignedRetailer = retailers.find((retailer) => retailer.retailerId === retailerId);
+
+
+      if (assignedRetailer) {
+        try {
+          console.log("PIN PAGE: ", assignedRetailer)
+          const response = await api.get(`/retailer/${assignedRetailer}`);
+          const data = response.data;
+          setRetailerData(data); // Save the data to the state
+        } catch (error) {
+          console.log("PIN PAGE: ","Error fetching retailer data: ", error);
+        }
+      } else {
+        console.log("PIN PAGE: ","Retailer not found with ID: ", retailerId);
+      }
     } catch (error) {
-      console.error("Error fetching retailer data: ", error);
+      console.log("PIN PAGE: ","Error fetching retailers: ", error);
     }
   };
 
@@ -54,6 +71,7 @@ export default function Pin({ setSelectedBeneficiary, retailerId }) {
 
         if(beneficiary.retailerAssigned == retailerId){
           setSelectedBeneficiary(beneficiary);
+          ToastAndroid.show('Logged in', ToastAndroid.SHORT);
           navigation.navigate("BeneficiaryDetails");
         }
         else if (beneficiary.id == "12345678"){
@@ -61,10 +79,16 @@ export default function Pin({ setSelectedBeneficiary, retailerId }) {
           setSelectedBeneficiary(beneficiary);
           navigation.navigate("BeneficiaryDetails");
         }
-        else{
-          const beneficiaryRetailerdata = (await api.get(`/retailer/${beneficiary.retailerAssigned}`)).data;
-          console.log(beneficiaryRetailerdata)
-          Alert.alert(`Beneficiary not allowed to make purchases from this retailer.\nAssigned retailer: ${beneficiaryRetailerdata.name} - ${beneficiaryRetailerdata.gnDivision} (${beneficiary.retailerAssigned}) `)
+        else {
+          const beneficiaryRetailerdata = (await api.get(`/retailers`)).data;
+          const assignedRetailer = beneficiaryRetailerdata.find(
+            (retailer) => retailer.retailerId === beneficiary.retailerAssigned
+          );
+        
+          if (assignedRetailer) {
+            const { name, gnDivision, retailerId } = assignedRetailer;
+            Alert.alert(`Beneficiary not allowed to make purchases from this retailer.\nAssigned retailer: ${name} - ${gnDivision} (${retailerId})`);
+          }
         }
       } else {
         Alert.alert("Beneficiary not found");

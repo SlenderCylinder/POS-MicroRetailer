@@ -2,7 +2,7 @@ import React from "react";
 import { View, Text, StyleSheet, TouchableOpacity } from "react-native";
 import { MaterialIcons } from "@expo/vector-icons";
 
-export default function CheckoutItem({ item, handleRemoveFromCart }) {
+export default function CheckoutItem({ item, handleRemoveFromCart, removable = true }) {
   const { name, quantity, price,id } = item;
   const total = quantity * price;
 
@@ -14,9 +14,11 @@ export default function CheckoutItem({ item, handleRemoveFromCart }) {
       </View>
       <View style={styles.itemPrice}>
         <Text style={styles.itemTotal}>Rs {total.toFixed(2)}</Text>
-        <TouchableOpacity onPress={() => handleRemoveFromCart(item)}>
-          <MaterialIcons name="delete" size={24} color="#ff0000" />
-        </TouchableOpacity>
+        {removable && (
+          <TouchableOpacity onPress={() => handleRemoveFromCart(item)}>
+            <MaterialIcons name="delete" size={24} color="#ff0000" />
+          </TouchableOpacity>
+        )}
       </View>
     </View>
   );

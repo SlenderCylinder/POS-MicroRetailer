@@ -23,13 +23,15 @@ export default function Card({
   exist,
   id,
 }) {
-  const [quantity, setQuantity] = useState(max);
+  const initialQuantity = Math.floor(max / Rquantity);
+  console.log(Rquantity);
+  const [quantity, setQuantity] = useState(initialQuantity);
   const [modalVisible, setModalVisible] = useState(false);
-  const [newPrice, setNewPrice] = useState(price);
 
   const handleIncrement = () => {
-    if (quantity < max) {
-      setQuantity(quantity + 1);
+    const newQuantity = quantity + 1; 
+    if (newQuantity <= initialQuantity) {
+      setQuantity(newQuantity);
     }
   };
 
@@ -40,20 +42,9 @@ export default function Card({
   };
 
   const handleAddToCartPress = () => {
-    onAddToCart(name, quantity, newPrice, id);
-    setQuantity(1); // Reset quantity to 1 after adding to cart
+    onAddToCart(name, quantity, price, id, unit, Rquantity);
+    setQuantity(initialQuantity); // Reset quantity to initial value after adding to cart
     setModalVisible(false); // Close the modal after adding to cart
-  };
-
-  const handlePriceChange = (text) => {
-    if (text === "") {
-      setNewPrice("");
-    } else {
-      const newPriceValue = parseFloat(text);
-      if (!isNaN(newPriceValue) && newPriceValue <= price) {
-        setNewPrice(newPriceValue);
-      }
-    }
   };
 
   return (
@@ -95,17 +86,6 @@ export default function Card({
                       <Text style={styles.modalQuantityButton}>+</Text>
                     </TouchableOpacity>
                   </View>
-                </View>
-                <View style={styles.modalPriceInputContainer}>
-                  <Text style={styles.modalPriceInputLabel}>
-                    Edit price (max Rs {price}):
-                  </Text>
-                  <TextInput
-                    style={styles.modalPriceInput}
-                    keyboardType="numeric"
-                    value={newPrice.toString()}
-                    onChangeText={handlePriceChange}
-                  />
                 </View>
                 <TouchableOpacity
                   style={[

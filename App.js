@@ -10,6 +10,7 @@ import { NavigationContainer } from "@react-navigation/native";
 import { Provider as PaperProvider } from "react-native-paper";
 import Loading from "./screens/Loading";
 import LanguageSelectionScreen from "./screens/Lang";
+import Other from "./screens/Other";
 import { Alert, StatusBar } from 'react-native';
 import { DeviceEventEmitter } from 'react-native';
 const Stack = createStackNavigator();
@@ -18,9 +19,8 @@ import { connectPrinter, requestBluetoothConnectPermission } from "./api/btprint
 import { getComodities } from "./api/comodities";
 
 let activeId = null;
-const retailerId = "0001";
-
-
+const retailerId = "" //define retailer ID here
+ 
 function App() {
   const [cartItems, setCartItems] = useState([]);
   const [pairedDevices, setpairedDevices] = useState([]);
@@ -207,6 +207,7 @@ function App() {
               />
             )}
           </Stack.Screen>
+
           <Stack.Screen
             name="BeneficiaryDetails"
             options={{ title: "Beneficiary Details", headerShown: false }}
@@ -230,6 +231,17 @@ function App() {
             component={LanguageSelectionScreen}
             options={{ headerShown: false }}
           />
+          <Stack.Screen
+            name="Other"
+            options={{ headerShown: false }}
+          >
+            {(props) => (
+              <Other
+                {...props}
+                  setCartItems={setCartItems}
+              />
+            )}
+          </Stack.Screen>
         </Stack.Navigator>
       </NavigationContainer>
     </PaperProvider>

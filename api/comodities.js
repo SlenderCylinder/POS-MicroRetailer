@@ -1,33 +1,3 @@
-import api from "./api";
+const Items = [{ "tam": "அரிசி", "image": "https://ik.imagekit.io/qsfifxkbx/Comodities/rice_rjUkfspMqs.png?updatedAt=1696814724545", "unit": "KG", "quantity": 1, "max": 10, "price": 188, "sin": "සහල්", "id": "1", "eng": "Rice" }, { "tam": "உ.கிழங்கு", "image": "https://ik.imagekit.io/qsfifxkbx/Comodities/potatoe_UGnpym2U45.png?updatedAt=1696814719989", "unit": "KG", "quantity": 1, "max": 2, "price": 190, "sin": "අල", "id": "10", "eng": "Potatoes" }, { "tam": "ரின் மீன்", "image": "https://objectstorage.ap-mumbai-1.oraclecloud.com/n/softlogicbicloud/b/cdn/o/products/600-600/114229--01--1555689118.jpeg", "unit": "TIN", "max": 2, "price": 650, "sin": "ටින් මාළු", "id": "11", "quantity": 1, "eng": "Tin fish" }, { "tam": "முட்டை", "image": "https://ik.imagekit.io/qsfifxkbx/Comodities/egg_EdDy8rxjJ.png?updatedAt=1696814715933", "unit": "Egg", "quantity": 1, "max": 20, "sin": "බිත්තර", "id": "12", "eng": "Eggs", "price": 50 }, { "tam": "உப்பு", "image": "https://ik.imagekit.io/qsfifxkbx/Comodities/salt_7Vw2qtSclb.png?updatedAt=1696814726865", "unit": "PKT", "quantity": 1, "max": 1, "price": 110, "sin": "ලුණු", "id": "13", "eng": "Salt" }, { "tam": "தே.எண்ணெய்", "image": "https://ik.imagekit.io/qsfifxkbx/Comodities/coconut-oil_lGfWPTilOV.png?updatedAt=1696814709381", "unit": "L", "quantity": 1, "max": 2, "price": 550, "sin": "පොල් තෙල්", "id": "14", "eng": "Coconut oil" }, { "tam": "சோயா", "image": "https://ik.imagekit.io/qsfifxkbx/Comodities/soya_TSnqdrqeY.jpg?updatedAt=1696814726868", "unit": "G", "price": 300, "sin": "සෝයා", "id": "15", "eng": "Soya", "max": 500, "quantity": 500 }, { "tam": "மிளகாய் தூள்", "image": "https://ik.imagekit.io/qsfifxkbx/Comodities/red-chilly-powder_CJ_2f6-ftH.png?updatedAt=1696814721031", "unit": "G", "quantity": 250, "price": 375, "sin": "මිරිස් කුඩු", "id": "16", "max": 250, "eng": "Chili Powder" }, { "tam": "மஞ்சள் தூள்", "image": "https://ik.imagekit.io/qsfifxkbx/Comodities/turmeric_QERixc1AN.png?updatedAt=1696814731602", "unit": "G", "quantity": 50, "price": 125, "sin": "කහ", "id": "17", "eng": "Turmeric", "max": 50 }, { "tam": "கறி பவுடர்", "image": "https://ik.imagekit.io/qsfifxkbx/Comodities/curryPowder_ip6z1DtU_.png?updatedAt=1697607820750", "unit": "G", "quantity": 250, "price": 500, "sin": "තුනපහ කුඩු", "id": "18", "eng": "Curry Powder", "max": 250 }, { "tam": "செத்தல்", "image": "https://ik.imagekit.io/qsfifxkbx/Comodities/dry-chilly_EVjPkcoHV.png?updatedAt=1696814711255", "unit": "G", "price": 275, "sin": "මිරිස්", "id": "19", "quantity": 250, "max": 250, "eng": "Dry Chili" }, { "tam": "கோ. மாவு", "image": "https://ik.imagekit.io/qsfifxkbx/Comodities/flour_SfJ49Wp91.png?updatedAt=1696814718461", "unit": "KG", "max": 8, "price": 200, "sin": "තිරිඟු පිටි", "id": "2", "eng": "Wheat Flour", "quantity": 1 }, { "tam": "மல்லி", "image": "https://ik.imagekit.io/qsfifxkbx/Comodities/coriander_DZT0HELjpg.png?updatedAt=1696814719179", "unit": "G", "quantity": 250, "price": 100, "sin": "කොත්තමල්ලි", "id": "20", "eng": "Coriander", "max": 250 }, { "tam": "மிளகு", "image": "https://ik.imagekit.io/qsfifxkbx/Comodities/pepper_ZloEcrt8W7.png?updatedAt=1696814719625", "unit": "G", "quantity": 50, "price": 120, "sin": "ගම්මිරිස්", "id": "21", "eng": "Pepper", "max": 50 }, { "tam": "பூண்டு", "image": "https://ik.imagekit.io/qsfifxkbx/Comodities/garlic_f9116asNV.png?updatedAt=1696814711476", "unit": "G", "quantity": 500, "sin": "සුදුලූණු", "id": "22", "eng": "Garlic", "max": 500, "price": 260 }, { "tam": "லைப் போய்", "image": "https://www.lifebuoy.in/content/dam/brands/lifebuoy/india/2133695-lifebuoy-innovation-total-soap-wrapper-125g---total-10.png", "unit": "PKT", "quantity": 1, "max": 2, "price": 160, "sin": "ලයිෆ්බෝය්  සබන්", "id": "23", "eng": "LifeBouy Soap" }, { "tam": "Baby Soap", "image": "https://globalfoodcity.com/wp-content/uploads/2017/12/28.jpg", "unit": "PKT", "quantity": 1, "sin": "බේබි සබන්", "id": "24", "eng": "Baby Soap", "price": 190, "max": 3 }, { "tam": "ஈவா", "image": "https://diaperhouse.lk/wp-content/uploads/2021/02/unnamed.png", "unit": "PKT", "quantity": 1, "max": 2, "price": 270, "sin": "ඊවා", "id": "25", "eng": "Eva" }, { "tam": "பனதால்", "image": "https://ik.imagekit.io/qsfifxkbx/Comodities/Panadol_F4TrGoXOZz.jpg?updatedAt=1696814716558", "unit": "CRD", "quantity": 1, "max": 2, "price": 50, "sin": "පැනඩෝල්", "id": "26", "eng": "Panadol" }, { "tam": "வேறு பொருட்கள்", "image": "https://img.freepik.com/premium-photo/shopping-bag-full-fresh-fruits-vegetables-with-assorted-ingredients_8087-2232.jpg", "unit": "LOT", "quantity": 1, "max": 691, "sin": "අනික්කුත්", "eng": "Other" }, { "tam": "அ. மாவு", "image": "https://ik.imagekit.io/qsfifxkbx/Comodities/rice-flour_JtPGjqtId.png?updatedAt=1696814724190", "unit": "KG", "quantity": 1, "max": 5, "price": 218, "sin": "හාල් පිටි", "id": "3", "eng": "Rice Flour" }, { "tam": "தேயிலை", "image": "https://ik.imagekit.io/qsfifxkbx/Comodities/tea_1ETJXJwoE.png?updatedAt=1696814730270", "unit": "G", "quantity": 500, "price": 750, "sin": "තේ කොළ", "id": "4", "eng": "Tea", "max": 500 }, { "tam": "சீனி", "image": "https://ik.imagekit.io/qsfifxkbx/Comodities/sugar_-r91qvSpYJ.png?updatedAt=1696814731959", "unit": "KG", "quantity": 1, "max": 3, "price": 268, "sin": "සීනි", "id": "5", "eng": "Sugar" }, { "tam": "பெ. வெங்காயம்", "image": "https://ik.imagekit.io/qsfifxkbx/Comodities/onion_Ldogt0yQy.png?updatedAt=1696814719091", "unit": "KG", "max": 2, "price": 220, "sin": "ලොකු ලූනු", "id": "6", "eng": "Big onion", "quantity": 1 }, { "tam": "பா.பயறு", "image": "https://ik.imagekit.io/qsfifxkbx/Comodities/green_pS-BTt8Pl.png?updatedAt=1696814718843", "unit": "KG", "quantity": 1, "max": 1, "price": 1000, "sin": "මුං ඇට", "id": "7", "eng": "Green Gramme" }, { "tam": "பருப்பு", "image": "https://ik.imagekit.io/qsfifxkbx/Comodities/dhal_09vNGBln0.png?updatedAt=1696814718977", "unit": "G", "sin": "මයිසූර් පරිප්පු", "id": "8", "eng": "Red Dhal", "max": 3500, "quantity": 3500, "price": 1120 }, { "tam": "கடலை", "image": "https://ik.imagekit.io/qsfifxkbx/Comodities/chick_7bH_EKoXr.png?updatedAt=1696814710252", "unit": "KG", "quantity": 1, "max": 1, "price": 650, "sin": "කඩල", "id": "9", "eng": "Chickpeas" }]
 
-let items = [];
-
-// Function to fetch data from the cloud source
-export async function getComodities() {
-  try {
-    // Fetch data from your cloud source
-    const response = await api.get(`/commodities`);
-    const data = response.data;
-
-    // Update the 'items' array with the fetched data
-    items = data;
-  } catch (error) {
-    console.error('Error fetching data:', error);
-  }
-}
-
-// Initial data population (optional)
-// You can call this function when your app starts to initially populate the 'items' array.
-export async function populateComodities() {
-  await getComodities();
-}
-
-// Export a function that resolves with 'items' when data is available
-export function getItems() {
-  return new Promise(async (resolve) => {
-    if (items.length === 0) {
-      await populateComodities();
-    }
-    resolve(items);
-  });
-}
+export default Items;

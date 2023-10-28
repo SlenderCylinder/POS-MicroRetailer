@@ -19,17 +19,18 @@ export default function Card({
   onAddToCart,
   unit,
   max,
+  navigation,
   Rquantity,
   exist,
   id,
 }) {
   const initialQuantity = Math.floor(max / Rquantity);
-  console.log(Rquantity);
   const [quantity, setQuantity] = useState(initialQuantity);
   const [modalVisible, setModalVisible] = useState(false);
+  const [newPrice, setNewPrice] = useState(price);
 
   const handleIncrement = () => {
-    const newQuantity = quantity + 1; 
+    const newQuantity = quantity + 1;
     if (newQuantity <= initialQuantity) {
       setQuantity(newQuantity);
     }
@@ -42,19 +43,30 @@ export default function Card({
   };
 
   const handleAddToCartPress = () => {
-    onAddToCart(name, quantity, price, id, unit, Rquantity);
-    setQuantity(initialQuantity); // Reset quantity to initial value after adding to cart
-    setModalVisible(false); // Close the modal after adding to cart
+    if (id === "27") {
+      setModalVisible(false);
+      // const updatedPrice = parseFloat(newPrice);
+      // onAddToCart(name, quantity, updatedPrice, id, unit, Rquantity);
+      navigation.navigate("Other")
+    } else {
+      onAddToCart(name, quantity, price, id, unit, Rquantity);
+      setQuantity(initialQuantity);
+      setModalVisible(false);
+    }
+  };
+
+  const handlePriceChange = (text) => {
+    setNewPrice(text);
   };
 
   return (
     <TouchableOpacity
       style={[
         styles.cardContainer,
-        exist && styles.cardContainerDisabled, // Add a conditional style to disable the card
+        exist && styles.cardContainerDisabled,
       ]}
       onPress={() => setModalVisible(true)}
-      disabled={exist} // Disable the card when exist is true
+      disabled={exist}
     >
       <ImageBackground source={{ uri: image }} style={styles.image}>
         <View style={styles.overlay}>
@@ -77,34 +89,34 @@ export default function Card({
                   <View style={styles.modalPriceContainer}>
                     <Text style={styles.modalPrice}>Rs {price}</Text>
                   </View>
-                  <View style={styles.modalQuantityContainer}>
-                    <TouchableOpacity onPress={handleDecrement}>
-                      <Text style={styles.modalQuantityButton}>-</Text>
-                    </TouchableOpacity>
-                    <Text style={styles.modalQuantity}>{quantity}</Text>
-                    <TouchableOpacity onPress={handleIncrement}>
-                      <Text style={styles.modalQuantityButton}>+</Text>
-                    </TouchableOpacity>
-                  </View>
-                </View>
-                <TouchableOpacity
-                  style={[
-                    styles.modalCartButton,
-                    exist && styles.modalCartButtonDisabled,
-                  ]}
-                  onPress={exist ? null : handleAddToCartPress}
-                  disabled={exist}
-                >
-                  <Text
+                    <View style={styles.modalQuantityContainer}>
+                      <TouchableOpacity onPress={handleDecrement}>
+                        <Text style={styles.modalQuantityButton}>-</Text>
+                      </TouchableOpacity>
+                      <Text style={styles.modalQuantity}>{quantity}</Text>
+                      <TouchableOpacity onPress={handleIncrement}>
+                        <Text style={styles.modalQuantityButton}>+</Text>
+                      </TouchableOpacity>
+                    </View>
+                  <TouchableOpacity
                     style={[
-                      styles.modalCartButtonText,
-                      exist && styles.modalCartButtonTextDisabled,
+                      styles.modalCartButton,
+                      exist && styles.modalCartButtonDisabled,
                     ]}
+                    onPress={exist ? null : handleAddToCartPress}
+                    disabled={exist}
                   >
-                    Add to cart
-                  </Text>
-                  <AntDesign name="shoppingcart" size={24} color="#ffffff" />
-                </TouchableOpacity>
+                    <Text
+                      style={[
+                        styles.modalCartButtonText,
+                        exist && styles.modalCartButtonTextDisabled,
+                      ]}
+                    >
+                      Add to cart
+                    </Text>
+                    <AntDesign name="shoppingcart" size={24} color="#ffffff" />
+                  </TouchableOpacity>
+                </View>
               </View>
             </TouchableWithoutFeedback>
           </View>

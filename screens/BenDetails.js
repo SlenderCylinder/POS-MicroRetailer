@@ -123,6 +123,7 @@ export default function BeneficiaryDetails({
               id={item.id}
               unit={item.unit}
               image={item.image}
+              navigation={navigation}
               onAddToCart={handleAddToCart}
               exist={cartItems.some((cartItem) => cartItem.id === item.id)}
             />
@@ -134,6 +135,7 @@ export default function BeneficiaryDetails({
                 Rquantity={items[index + 1].quantity}
                 unit={items[index + 1].unit}
                 max={items[index + 1].max}
+                navigation={navigation}
                 image={items[index + 1].image}
                 onAddToCart={handleAddToCart}
                 exist={cartItems.some(

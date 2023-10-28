@@ -14,7 +14,7 @@ import {
   Modal,
 } from "react-native";
 import CheckoutItem from "../components/CheckoutItem";
-import { useNavigation } from "@react-navigation/native";
+import { useNavigation, useIsFocused } from "@react-navigation/native";
 import { AntDesign } from "@expo/vector-icons";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { StatusBar } from 'react-native';
@@ -30,7 +30,7 @@ export default function CartPage({
   setCartItems,
   setSelectedBeneficiary,
 }) {
-  const { amount, balance, id } = selectedBeneficiary;
+  const { amount, balance, id } = selectedBeneficiary ?? { amount: 0, balance: 0, id: null };
   const totalPrice = cartItems.reduce(
     (total, item) => total + item.price * item.quantity,
     0
@@ -39,32 +39,50 @@ export default function CartPage({
   const [isLoading, setIsLoading] = useState(false);
   const [ loadingState, setloadingState ] = useState("Processing");
   const [isSuccess, setIsSuccess] = useState(false);
-  const navigation = useNavigation();
   const [assignedRetailer, setAssignedRetailer] = useState(null);
   const [items, setItems] = useState([]); 
   const [isReceiptPrinted, setIsReceiptPrinted] = useState(false);
   const [checkoutInitiated, setCheckoutInitiated] = useState(false);
   const [CheckoutSuccess, setIsCheckoutSuccess] = useState(false);
 
+  const navigation = useNavigation();
+  const isFocused = useIsFocused();
+
   useFocusEffect(
     React.useCallback(() => {
       if (checkoutInitiated) {
         navigation.setOptions({
-          gestureEnabled: false, // Disable swipe gestures to navigate away
+          gestureEnabled: false,
+        });
+      } else {
+        navigation.setOptions({
+          gestureEnabled: true,
         });
       }
-    }));
-
-    useFocusEffect(
-      useCallback(() => {
-        const unsubscribe = navigation.addListener("beforeRemove", (e) => {
-          e.preventDefault();
-          Alert.alert("Not allowed:", "Transaction already processed. Please logout when done");
-        });
-        return unsubscribe;
-      }, [setIsCheckoutSuccess])
-    );
+    }, [checkoutInitiated, navigation])
+  );
   
+
+  useEffect(() => {
+    if (isFocused) {
+      const unsubscribe = navigation.addListener("beforeRemove", (e) => {
+        if (checkoutInitiated) {
+          e.preventDefault();
+          // setTimeout(() => {
+          //   if (isFocused) {
+          //   Alert.alert(
+          //     "Not allowed:",
+          //     "Transaction already processed. Please logout when done"
+          //   );}
+          // }, 3000); 
+        }
+      });
+
+      return () => {
+        unsubscribe();
+      };
+    }
+  }, [checkoutInitiated, isFocused, navigation]);
 
   // Fetch items from the API and cache them
   useEffect(() => {
@@ -143,6 +161,7 @@ export default function CartPage({
   }, [retailerId]);
 
   const handlePrintReceipt = async () => {
+    
     const orderID = generateOrderID(selectedBeneficiary);
     console.log("Order ID:", orderID);
 
@@ -159,7 +178,7 @@ export default function CartPage({
         try {
           const response = await api.get(`/beneficiary/${selectedBeneficiary.id}`);
           const beneficiary = response.data;
-          console.log(beneficiary.amount)
+
           console.log(beneficiary.currentCycle)
           bal = beneficiary.amount
           cycle = beneficiary.currentCycle
@@ -235,9 +254,9 @@ export default function CartPage({
           // Print customer details, order number, and date
           if (selectedBeneficiary.id) {
             if (assignedRetailer){
-            assignedRetailer.name = "Test Retailer"
-            assignedRetailer.dsDivision = "T.DS"
-            assignedRetailer.gnDivision = "T.GN"}
+            assignedRetailer.name = assignedRetailer.name
+            assignedRetailer.dsDivision = assignedRetailer.dsDivision
+            assignedRetailer.gnDivision = assignedRetailer.gnDivision}
             else {!assignedRetailer} {
               setAssignedRetailer({"name":"n/a","dsDivision":"n/a","retailerId":"n/a","gnDivision":"n/a"})
             }
@@ -270,7 +289,7 @@ export default function CartPage({
             const itemEng = items.find(i => i.tam === item.name) || items.find(i => i.sin === item.name);
             const itemName = itemEng ? (itemEng.eng || itemEng.sin) : item.name;
             const unit = item.unit || '';
-            const itemquantity = (item.Rquantity*item.quantity);
+            const itemquantity = (Number(item.Rquantity) * Number(item.quantity));
             const amount = (item.price * item.quantity).toFixed(2); // Calculate the total amount for the item
             BluetoothEscposPrinter.printColumn(
               [16, 7, 9], // Adjust column widths as needed
@@ -455,10 +474,11 @@ export default function CartPage({
   };
 
   const handleCloseSuccess = () => {
-    navigation.navigate("Home");
-    setIsSuccess(false);
-    setSelectedBeneficiary(null);
-    setCartItems([]);
+    setCheckoutInitiated(false);
+    setIsSuccess(true);
+    navigation && navigation.navigate("Home");
+    setSelectedBeneficiary && setSelectedBeneficiary(null);
+    setCartItems && setCartItems([]);
   };
 
   const handleReprintReceipt = async () => {
@@ -544,16 +564,28 @@ export default function CartPage({
         )}
       <Modal visible={isSuccess} animationType="slide" transparent={true}>
         <View style={styles.successContainer}>
-          <AntDesign name="checkcircle" size={64} color="green" />
-          <Text style={styles.successText}>Thank you!</Text>
-          <TouchableOpacity
+          <AntDesign name="closecircle" size={64} color="red" />
+          <Text style={styles.successText}>Are you sure you want to logout?</Text>
+            <TouchableOpacity
               style={[
-                styles.checkoutButton, // Use the same styles as the "Checkout & Print" button
+                styles.checkoutButton,
+                styles.button,
                 isLoading ? styles.loadingButton : null,
               ]}
               onPress={handleCloseSuccess}
             >
-              <Text style={styles.checkoutText}>Logout</Text>
+              <Text style={styles.checkoutText}>Yes</Text>
+            </TouchableOpacity>
+
+              <TouchableOpacity
+              style={[
+                styles.checkoutButton,
+                styles.button,
+                isLoading ? styles.loadingButton : null,
+              ]}
+              onPress={() => setIsSuccess(false)} // Set isSuccess to false
+            >
+              <Text style={styles.checkoutText}>No</Text>
             </TouchableOpacity>
         </View>
       </Modal>

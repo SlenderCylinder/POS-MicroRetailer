@@ -96,16 +96,16 @@ export default function Loading({ navigation, retailer }) {
 
   const checkInternetConnectivity = async () => {
     try {
-      const response = await fetch("https://www.google.com");
-      if (response.ok) {
+      const response = true; //removing network connectivity check temporarily
+      if (response) {
           navigation.navigate("Home");
       } else {
         //setShowRetryButton(true);
-        navigation.navigate("Pin");
+        navigation.navigate("Home");
       }
     } catch (error) {
       //setShowRetryButton(true);
-      navigation.navigate("Pin");
+      navigation.navigate("Home");
     }
   };
 

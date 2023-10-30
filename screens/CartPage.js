@@ -349,13 +349,13 @@ export default function CartPage({
           BluetoothEscposPrinter.printText("--------------------------------\n\r", {});
           // Check if assignedRetailer.name is null and provide a default value
           console.log("Retailer name ", assignedRetailer.name)
-          const retailerName = assignedRetailer.name ? assignedRetailer.name : "n/a";
-          BluetoothEscposPrinter.printText("Retailer: " + retailerName + "\n\r", {});
+          //const retailerName = assignedRetailer.name ? assignedRetailer.name : "n/a";
+          BluetoothEscposPrinter.printText("Retailer: TEST" + "\n\r", {});
 
           // Check if assignedRetailer.gnDivision and assignedRetailer.dsDivision are null and provide default values
-          const gnDivision = assignedRetailer.gnDivision ? assignedRetailer.gnDivision : "n/a";
-          const dsDivision = assignedRetailer.dsDivision ? assignedRetailer.dsDivision : "n/a";
-          BluetoothEscposPrinter.printText(gnDivision + " - " + dsDivision + "\n\r", {});
+          //const gnDivision = assignedRetailer.gnDivision ? assignedRetailer.gnDivision : "n/a";
+          //const dsDivision = assignedRetailer.dsDivision ? assignedRetailer.dsDivision : "n/a";
+          BluetoothEscposPrinter.printText("Test DS" + " - " + "Test GN" + "\n\r", {});
           BluetoothEscposPrinter.printText("--------------------------------\n\r", {});
         
           // Set alignment to CENTER for the thank you message

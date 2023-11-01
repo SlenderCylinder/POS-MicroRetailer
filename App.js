@@ -19,7 +19,7 @@ import { connectPrinter, requestBluetoothConnectPermission } from "./api/btprint
 import { getComodities } from "./api/comodities";
 
 let activeId = null;
-const retailerId = "" //retailre ID goes here
+const retailerId = "" //retailer ID goes here
 
 function App() {
   const [cartItems, setCartItems] = useState([]);

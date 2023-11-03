@@ -24,8 +24,6 @@ const connectedListener = DeviceEventEmitter.addListener(
     BluetoothManager.EVENT_CONNECTED,
     (response) => {
       console.log('Connected to device:', response);
-      // Perform your printing actions here
-      // Make sure to remove the listener to avoid memory leaks
       connectedListener.remove();
     }
   );
@@ -34,7 +32,7 @@ const connectedListener = DeviceEventEmitter.addListener(
     BluetoothManager.EVENT_UNABLE_CONNECT,
     (error) => {
       console.log('Error connecting to printer:', error);
-      // Make sure to remove the listener to avoid memory leaks
+      // Remove listener if cannot connect
       unableConnectListener.remove();
     }
   );
@@ -115,7 +113,8 @@ const BluetoothEnable = async () => {
             try {
               paired.push(JSON.parse(devices[i]));
             } catch (e) {
-              // Ignore any parsing errors
+              console.log("Error", e)
+
             }
           }
         }
@@ -129,7 +128,7 @@ const BluetoothEnable = async () => {
 
 const scanForDevices = async () => {
     if (setIsScanningCallback) {
-        setIsScanningCallback(true); // Set scanning state to false
+        setIsScanningCallback(true); 
       }
   try {
     // Request the BLUETOOTH_SCAN permission
@@ -157,14 +156,14 @@ const scanForDevices = async () => {
         })
         .catch((er) => {
             if (setIsScanningCallback) {
-                setIsScanningCallback(false); // Set scanning state to false
+                setIsScanningCallback(false); 
               }
           alert('error' + JSON.stringify(er));
         });
     } else {
       // Permission denied, handle it as needed
       if (setIsScanningCallback) {
-        setIsScanningCallback(false); // Set scanning state to false
+        setIsScanningCallback(false); 
       }
       Alert.alert('Bluetooth Scan Permission Denied');
     }
@@ -172,7 +171,7 @@ const scanForDevices = async () => {
     console.error(error);
   } finally {
     if (setIsScanningCallback) {
-        setIsScanningCallback(false); // Set scanning state to false
+        setIsScanningCallback(false); 
       }
   }
 };

@@ -216,6 +216,8 @@ const scanForDevices = async () => {
     BluetoothManager.connect(rowData) // the device address scanned.
     .then((s) => {
          isPrinterOk = true;
+        // Uncomment if you need a test printout at connect
+
         // console.log(s);        // print();
         // const textToPrint = "PRNT CON. OK";
         // BluetoothTscPrinter.printLabel({

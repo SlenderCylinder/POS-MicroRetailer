@@ -94,6 +94,8 @@ export default function Loading({ navigation, retailer }) {
     setInnovationText("Resilience");
   };
 
+  //TODO: Add a proper connectivity check 
+
   const checkInternetConnectivity = async () => {
     try {
       const response = true; //removing network connectivity check temporarily

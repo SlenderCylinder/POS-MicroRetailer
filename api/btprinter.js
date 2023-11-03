@@ -158,7 +158,7 @@ const scanForDevices = async () => {
             if (setIsScanningCallback) {
                 setIsScanningCallback(false); 
               }
-          alert('error' + JSON.stringify(er));
+          Alert.alert('error' + JSON.stringify(er));
         });
     } else {
       // Permission denied, handle it as needed

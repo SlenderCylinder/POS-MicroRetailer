@@ -181,7 +181,7 @@ const scanForDevices = async () => {
 // };
 
 
-    const connectToDevice = (paireddevice) => {
+    const connectToDevice = (pairedDevice) => {
         console.log("Attempting to connect to the following device:")
         try {
 

@@ -48,7 +48,7 @@ function App() {
   const deviceAlreadyPairedListener = DeviceEventEmitter.addListener(
     BluetoothManager.EVENT_DEVICE_ALREADY_PAIRED,
     (devices) => {
-      console.log("Emitted", devices)
+      console.log("Already paired devices discovered: ", devices)
     }
   );
 
@@ -86,6 +86,7 @@ function App() {
   
   const BluetoothEnable = async () => {
     try {
+      console.log("Checking devices")
       const devices = await BluetoothManager.enableBluetooth();
       console.log(devices)
 
@@ -123,7 +124,12 @@ function App() {
       //   console.log("No paired devices found.");
       // }
     } catch (error) {
-      Alert.alert(error); 
+      if (error.message === "EVENT_BLUETOOTH_NOT_SUPPORT") {
+        Alert.alert("Bluetooth Error:", "Device does not support Bluetooth. This application needs Bluetooth to function.");
+      } else {
+        console.log("Bluetooth error:", error);
+        Alert.alert("Bluetooth Error", error.toString());
+      }
     }
   };
 
@@ -131,10 +137,9 @@ function App() {
     const interval = setInterval(() => {
       console.log("Sending printer wake up signal")
       BluetoothEnable();
-    }, 5 * 1000); // Run BluetoothEnable every 20 seconds
-
+    }, 5 * 8000); 
     return () => {
-      clearInterval(interval); // Clear the interval when the component unmounts
+      clearInterval(interval); 
     };
   };
 

@@ -9,12 +9,12 @@ import {
   StatusBar,
 } from "react-native";
 import { Button, Icon } from "react-native-elements";
-import Logo from "../assets/logo";
+import AdminLogo from "../assets/admin_logo";
 import { useNavigation } from "@react-navigation/native";
 import { LinearGradient } from "expo-linear-gradient";
 import { BlurView } from "expo-blur";
 
-export default function Home() {
+export default function Admin() {
   const navigation = useNavigation();
   const [animation] = useState(new Animated.Value(0));
 
@@ -41,7 +41,7 @@ export default function Home() {
       <StatusBar barStyle="light-content" />
         <BlurView intensity={100} style={StyleSheet.absoluteFill}>
           <LinearGradient
-            colors={["#87CEFA", "#87CEEB"]}
+            colors={["#FFC371", "#FF5F6D"]}
             start={{ x: 0, y: 0 }}
             end={{ x: 1, y: 1 }}
             style={styles.gradient}
@@ -52,7 +52,7 @@ export default function Home() {
               { transform: [{ translateY: logoTranslateY }] },
             ]}
           >
-            <Logo />
+            <AdminLogo />
           </Animated.View>
           <Animated.View
             style={[
@@ -67,39 +67,23 @@ export default function Home() {
               <Icon
                 style={{ marginRight: 10 }}
                 color={"white"}
-                name="qrcode"
+                name="user"
                 type="font-awesome"
               />
-              <Text style={{ color: "white", fontSize: 20 }}>Scan QR</Text>
+              <Text style={{ color: "white", fontSize: 20 }}>Sign In</Text>
             </TouchableOpacity>
             <TouchableOpacity
               style={[styles.button, { marginTop: 20 }]}
               title="Pin"
-              onPress={() => navigation.navigate("Pin")}
+              onPress={() => navigation.navigate("Status")}
             >
               <Icon
                 style={{ marginRight: 10 }}
                 color={"white"}
-                name="lock"
+                name="gears"
                 type="font-awesome"
               />
-              <Text style={{ color: "white", fontSize: 20 }}>Enter PIN</Text>
-            </TouchableOpacity>
-            <TouchableOpacity
-              style={[
-                styles.button,
-                { marginTop: 20, backgroundColor: "red"/* Customize button style */ },
-                { width: 105, height: 50, borderRadius: 15, alignSelf: "flex-start", marginBottom: 5, marginLeft: 15, marginTop: 130 }
-              ]}
-              onPress={() => navigation.navigate("Admin" /* Replace with your screen name */)}
-            >
-              <Icon
-                style={{ marginRight: 10 }}
-                color={"white"}
-                name="key" // Change to the appropriate icon name
-                type="font-awesome" // Change to the appropriate icon type
-              />
-              <Text style={{ color: "white", fontSize: 15 }}>Admin</Text>
+              <Text style={{ color: "white", fontSize: 20 }}>Status</Text>
             </TouchableOpacity>
           </Animated.View>
         </BlurView>

@@ -10,6 +10,7 @@
   "dependencies": {
     "@react-native-async-storage/async-storage": "1.18.2",
     "@react-native-community/masked-view": "^0.1.11",
+    "@react-native-community/netinfo": "^11.0.0",
     "@react-navigation/native": "^6.1.8",
     "@react-navigation/stack": "^6.3.18",
     "axios": "^1.5.0",
@@ -25,6 +26,7 @@
     "react-native-ble-manager": "^10.1.5",
     "react-native-ble-plx": "^3.1.0",
     "react-native-bluetooth-escpos-printer": "github:januslo/react-native-bluetooth-escpos-printer",
+    "react-native-device-info": "^10.11.0",
     "react-native-elements": "^3.4.3",
     "react-native-gesture-handler": "^2.13.2",
     "react-native-paper": "^5.10.6",

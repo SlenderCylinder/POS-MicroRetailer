@@ -4,6 +4,8 @@ import Scanner from "./screens/Scanner";
 import { createStackNavigator } from "@react-navigation/stack";
 import Home from "./screens/Home";
 import Pin from "./screens/Pin";
+import Admin from "./screens/Admin";
+import Status from "./screens/Status";
 import BeneficiaryDetails from "./screens/BenDetails";
 import CartPage from "./screens/CartPage";
 import { NavigationContainer } from "@react-navigation/native";
@@ -14,7 +16,7 @@ import Other from "./screens/Other";
 import { Alert, StatusBar } from 'react-native';
 import { DeviceEventEmitter } from 'react-native';
 const Stack = createStackNavigator();
-import {BluetoothManager} from 'react-native-bluetooth-escpos-printer';
+import { BluetoothManager} from 'react-native-bluetooth-escpos-printer';
 import { connectPrinter, requestBluetoothConnectPermission } from "./api/btprinter";
 import { getComodities } from "./api/comodities";
 
@@ -189,6 +191,16 @@ function App() {
           <Stack.Screen name="Pin">
             {(props) => (
               <Pin {...props} retailerId= {retailerId} setSelectedBeneficiary={setSelectedBeneficiary} />
+            )}
+          </Stack.Screen>
+          <Stack.Screen name="Admin">
+            {(props) => (
+              <Admin {...props} retailerId= {retailerId} setSelectedBeneficiary={setSelectedBeneficiary} />
+            )}
+          </Stack.Screen>
+          <Stack.Screen name="Status">
+            {(props) => (
+              <Status {...props} retailerId= {retailerId} setSelectedBeneficiary={setSelectedBeneficiary} />
             )}
           </Stack.Screen>
           <Stack.Screen name="Scanner">

@@ -5,32 +5,30 @@ import { createStackNavigator } from "@react-navigation/stack";
 import Home from "./screens/Home";
 import Pin from "./screens/Pin";
 import Admin from "./screens/Admin";
+import AdminLogin from "./screens/AdminLogin";
 import Status from "./screens/Status";
 import BeneficiaryDetails from "./screens/BenDetails";
 import CartPage from "./screens/CartPage";
 import { NavigationContainer } from "@react-navigation/native";
-import { Provider as PaperProvider } from "react-native-paper";
 import Loading from "./screens/Loading";
 import LanguageSelectionScreen from "./screens/Lang";
 import Other from "./screens/Other";
-import { Alert, StatusBar } from 'react-native';
-import { DeviceEventEmitter } from 'react-native';
+import { Alert, StatusBar, ToastAndroid, DeviceEventEmitter  } from 'react-native';
 const Stack = createStackNavigator();
 import { BluetoothManager} from 'react-native-bluetooth-escpos-printer';
 import { connectPrinter, requestBluetoothConnectPermission } from "./api/btprinter";
 import { getComodities } from "./api/comodities";
+import AdminDashboard from "./screens/AdminDashboard";
 
 let activeId = null;
 const retailerId = "" //retailer ID goes here
 
 function App() {
   const [cartItems, setCartItems] = useState([]);
-  const [pairedDevices, setpairedDevices] = useState([]);
   const [selectedBeneficiary, setSelectedBeneficiary] = useState(null);
   const [language, setLanguage] = useState("tam");
   const [retailer, setRetailer] = useState(null);
   const [isScanning, setIsScanning] = useState(false);
-  const [activedeviceId, setActivedeviceId] = useState(null);
 
 
  
@@ -128,9 +126,12 @@ function App() {
     } catch (error) {
       if (error.message === "EVENT_BLUETOOTH_NOT_SUPPORT") {
         Alert.alert("Bluetooth Error:", "Device does not support Bluetooth. This application needs Bluetooth to function.");
+      }
+      if (error.message === "Error: BT NOT ENABLED") {
+        Alert.alert("You need to enable Bluetooth for Printing receipts.");
       } else {
         console.log("Bluetooth error:", error);
-        Alert.alert("Bluetooth Error", error.toString());
+        ToastAndroid.show("You need to enable Bluetooth for Printing receipts. This app will not function without Bluetooth", ToastAndroid.SHORT);
       }
     }
   };
@@ -139,7 +140,7 @@ function App() {
     const interval = setInterval(() => {
       console.log("Sending printer wake up signal")
       BluetoothEnable();
-    }, 5 * 8000); 
+    }, 5 * 1000); 
     return () => {
       clearInterval(interval); 
     };
@@ -170,7 +171,6 @@ function App() {
 
 
   return (
-    <PaperProvider>
       <NavigationContainer>
         <Stack.Navigator>
           <Stack.Screen name="Loading" options={{ headerShown: false }}>
@@ -196,6 +196,16 @@ function App() {
           <Stack.Screen name="Admin">
             {(props) => (
               <Admin {...props} retailerId= {retailerId} setSelectedBeneficiary={setSelectedBeneficiary} />
+            )}
+          </Stack.Screen>
+          <Stack.Screen name="Admin Login">
+            {(props) => (
+              <AdminLogin {...props} retailerId= {retailerId} setSelectedBeneficiary={setSelectedBeneficiary} />
+            )}
+          </Stack.Screen>
+          <Stack.Screen name="Admin Dashboard">
+            {(props) => (
+              <AdminDashboard {...props} retailerId= {retailerId} setSelectedBeneficiary={setSelectedBeneficiary} />
             )}
           </Stack.Screen>
           <Stack.Screen name="Status">
@@ -261,7 +271,6 @@ function App() {
           </Stack.Screen>
         </Stack.Navigator>
       </NavigationContainer>
-    </PaperProvider>
   );
 }
 

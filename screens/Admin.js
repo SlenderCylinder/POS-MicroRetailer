@@ -62,7 +62,8 @@ export default function Admin() {
           >
             <TouchableOpacity
               style={styles.button}
-              onPress={() => navigation.navigate("Scanner")}
+              title="admin-signin"
+              onPress={() => navigation.navigate("Admin Login")}
             >
               <Icon
                 style={{ marginRight: 10 }}
@@ -74,7 +75,7 @@ export default function Admin() {
             </TouchableOpacity>
             <TouchableOpacity
               style={[styles.button, { marginTop: 20 }]}
-              title="Pin"
+              title="status"
               onPress={() => navigation.navigate("Status")}
             >
               <Icon

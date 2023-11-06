@@ -428,7 +428,7 @@ export default function CartPage({
                     if (isPrinterOk) {
                       try {
                         await connectPrinter(activeId);
-                        await delay(3000); // Wait for the printer connection
+                        await delay(1000); // Wait for the printer connection
                       } catch (error) {
                         console.log("Printer error:", error);
                         Alert.alert("Printer disconnected. Check printer and reprint");
@@ -461,7 +461,7 @@ export default function CartPage({
                     // Introduce a 2-second delay before setting the loading state back to false
                     await new Promise((resolve) => setTimeout(resolve, 2000));
                     setIsLoading(false);
-                  }, 4000);
+                  }, 200);
                   handleRemoveFromCart(null);
                 })
                 .catch((error) => {

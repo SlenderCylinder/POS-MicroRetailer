@@ -89,15 +89,15 @@ export default function Home() {
               style={[
                 styles.button,
                 { marginTop: 20, backgroundColor: "red"/* Customize button style */ },
-                { width: 105, height: 50, borderRadius: 15, alignSelf: "flex-start", marginBottom: 5, marginLeft: 15, marginTop: 130 }
+                { width: 105, height: 50, borderRadius: 15, alignSelf: "flex-start", marginBottom: 5, marginLeft: 25, marginTop: 190 }
               ]}
               onPress={() => navigation.navigate("Admin" /* Replace with your screen name */)}
             >
               <Icon
                 style={{ marginRight: 10 }}
                 color={"white"}
-                name="key" // Change to the appropriate icon name
-                type="font-awesome" // Change to the appropriate icon type
+                name="key" 
+                type="font-awesome" 
               />
               <Text style={{ color: "white", fontSize: 15 }}>Admin</Text>
             </TouchableOpacity>

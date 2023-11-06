@@ -105,6 +105,10 @@ export default function Status() {
       if (error.message === "EVENT_BLUETOOTH_NOT_SUPPORT") {
         setBluetoothStatus("Not supported by device")
         console.log("Bluetooth Error:", "Device does not support Bluetooth. This application needs Bluetooth to function.");
+      }
+      if (error.message === "BT NOT ENABLED") {
+        setBluetoothStatus("Disabled. Enable Bluetooth in Settings.")
+        console.log("Bluetooth Error:", "User disabled Bluetooth");
       } else {
         console.log("Bluetooth error:", error);
       }
